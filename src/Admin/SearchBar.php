@@ -67,12 +67,29 @@ class SearchBar
     private static function doEnqueue(string $context): void
     {
         $handle = 'pressbooks-borges';
+        $manifestPath = WP_PLUGIN_DIR . '/pressbooks-borges/dist/manifest.json';
 
-        Vite\enqueue_asset(
-            WP_PLUGIN_DIR . '/pressbooks-borges/dist',
-            'resources/assets/js/pressbooks-borges.js',
-            ['handle' => $handle]
-        );
+        if (! file_exists($manifestPath)) {
+            return;
+        }
+
+        $manifest = json_decode(file_get_contents($manifestPath), true);
+        $entry = $manifest['resources/assets/js/pressbooks-borges.js'] ?? null;
+
+        if (! $entry) {
+            return;
+        }
+
+        $baseUrl = plugins_url('dist', WP_PLUGIN_DIR . '/pressbooks-borges/pressbooks-borges.php');
+        $pluginUrl = plugins_url('pressbooks-borges/dist');
+
+        if (! empty($entry['css'])) {
+            foreach ($entry['css'] as $css) {
+                wp_enqueue_style($handle . '-style', $pluginUrl . '/' . $css, [], null);
+            }
+        }
+
+        wp_enqueue_script($handle, $pluginUrl . '/' . $entry['file'], [], null, true);
 
         $userId = get_current_user_id();
         $currentBlogId = $context === 'webbook' ? get_current_blog_id() : null;
