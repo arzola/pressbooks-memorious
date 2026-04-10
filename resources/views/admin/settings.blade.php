@@ -1,8 +1,10 @@
 <div class="wrap">
     <h1>{{ __('Pressbooks Borges Search Settings', 'pressbooks-borges') }}</h1>
 
-    <form method="post" action="edit.php?action=pb_borges_save_settings">
-        @csrf
+    <form method="post" action="options.php">
+        {!! wp_nonce_field('pb_borges_settings_group-options', '_wpnonce', true, false) !!}
+        <input type="hidden" name="option_page" value="pb_borges_settings_group" />
+        <input type="hidden" name="action" value="update" />
 
         <table class="form-table">
             <tr>
@@ -51,7 +53,7 @@
                     <input type="checkbox"
                            name="pb_borges_settings[enabled_admin]"
                            value="1"
-                           @if(!empty($settings['enabled_admin'])) checked @endif />
+                           {{ !empty($settings['enabled_admin']) ? 'checked' : '' }} />
                 </td>
             </tr>
             <tr>
@@ -60,7 +62,7 @@
                     <input type="checkbox"
                            name="pb_borges_settings[enabled_webbook]"
                            value="1"
-                           @if(!empty($settings['enabled_webbook'])) checked @endif />
+                           {{ !empty($settings['enabled_webbook']) ? 'checked' : '' }} />
                 </td>
             </tr>
             <tr>
@@ -69,7 +71,7 @@
                     <input type="checkbox"
                            name="pb_borges_settings[index_private_books]"
                            value="1"
-                           @if(!empty($settings['index_private_books'])) checked @endif />
+                           {{ !empty($settings['index_private_books']) ? 'checked' : '' }} />
                     <p class="description">
                         {{ __('Content is still access-controlled at query time.', 'pressbooks-borges') }}
                     </p>
@@ -81,7 +83,7 @@
                     <input type="checkbox"
                            name="pb_borges_settings[index_draft_content]"
                            value="1"
-                           @if(!empty($settings['index_draft_content'])) checked @endif />
+                           {{ !empty($settings['index_draft_content']) ? 'checked' : '' }} />
                 </td>
             </tr>
             <tr>
