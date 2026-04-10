@@ -106,7 +106,9 @@ class SearchAdmin
             wp_send_json_error(['message' => 'Unauthorized'], 403);
         }
 
-        $search = \Pressbooks\Container::get('Borges\Search');
+        $search = new \PressbooksBorges\Search\SearchService(
+            \PressbooksBorges\Search\TypesenseClient::fromSettings()
+        );
         $sites = get_sites(['number' => 0]);
 
         foreach ($sites as $site) {
@@ -128,7 +130,9 @@ class SearchAdmin
         }
 
         try {
-            $search = \Pressbooks\Container::get('Borges\Search');
+            $search = new \PressbooksBorges\Search\SearchService(
+                \PressbooksBorges\Search\TypesenseClient::fromSettings()
+            );
             $search->ensureCollections();
             wp_send_json_success([
                 'message' => __('Collections created successfully.', 'pressbooks-borges'),
