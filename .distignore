@@ -1,0 +1,17 @@
+.git
+.idea
+assets/src
+bin
+node_modules
+tests
+.distignore
+.editorconfig
+.gitattributes
+.gitignore
+.phpstorm.meta.php
+codecov.yml
+coverage.xml
+phpunit.xml
+package.json
+package-lock.json
+vite.config.js

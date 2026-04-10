@@ -1,0 +1,9 @@
+.idea/
+vendor/
+node_modules/
+/wp-content/
+.php-cs-fixer.cache
+.phpunit.result.cache
+LICENSE
+.DS_Store
+*.log

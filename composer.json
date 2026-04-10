@@ -1,0 +1,63 @@
+{
+	"name": "pressbooks/pressbooks-borges",
+	"license": "GPL-3.0-or-later",
+	"type": "wordpress-plugin",
+	"description": "Fast, faceted search for Pressbooks networks powered by Typesense.",
+	"homepage": "https://github.com/pressbooks/pressbooks-borges",
+	"authors": [
+		{
+			"name": "Book Oven Inc.",
+			"email": "code@pressbooks.com",
+			"homepage": "https://pressbooks.org"
+		}
+	],
+	"keywords": [
+		"ebooks",
+		"publishing",
+		"search",
+		"typesense"
+	],
+	"support": {
+		"email": "code@pressbooks.com",
+		"issues": "https://github.com/pressbooks/pressbooks-borges/issues/",
+		"source": "https://github.com/pressbooks/pressbooks-borges/"
+	},
+	"config": {
+		"allow-plugins": {
+			"composer/installers": true
+		}
+	},
+	"autoload": {
+		"psr-4": {
+			"PressbooksBorges\\": "src/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"Tests\\": "tests/"
+		}
+	},
+	"require": {
+		"php": "^8.3",
+		"pressbooks/frontend-tools": "^1.0.0",
+		"typesense/typesense-php": "^1.0"
+	},
+	"require-dev": {
+		"laravel/pint": "^1.10.6",
+		"yoast/phpunit-polyfills": "^1.0.5"
+	},
+	"scripts": {
+		"fix": [
+			"./vendor/bin/pint"
+		],
+		"standards": [
+			"./vendor/bin/pint --test"
+		],
+		"test": [
+			"./vendor/bin/phpunit --configuration phpunit.xml"
+		],
+		"test-coverage": [
+			"./vendor/bin/phpunit --configuration phpunit.xml --coverage-clover coverage.xml"
+		]
+	}
+}
