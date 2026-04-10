@@ -24,9 +24,9 @@ class SearchService
     public function getIndexers(): array
     {
         return apply_filters('pb_borges_indexers', [
-            new SectionsIndexer(),
-            new BooksIndexer(),
-            new ContributorsIndexer(),
+            new SectionsIndexer,
+            new BooksIndexer,
+            new ContributorsIndexer,
         ]);
     }
 

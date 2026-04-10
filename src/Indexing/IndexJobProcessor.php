@@ -132,9 +132,9 @@ class IndexJobProcessor
         $payload = $job->payload ? json_decode($job->payload, true) : [];
 
         $indexers = apply_filters('pb_borges_indexers', [
-            new Indexers\SectionsIndexer(),
-            new Indexers\BooksIndexer(),
-            new Indexers\ContributorsIndexer(),
+            new Indexers\SectionsIndexer,
+            new Indexers\BooksIndexer,
+            new Indexers\ContributorsIndexer,
         ]);
 
         switch ($job->job_type) {
