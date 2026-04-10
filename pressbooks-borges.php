@@ -21,6 +21,8 @@
 use PressbooksBorges\Bootstrap;
 use PressbooksBorges\Database\Migration;
 
+require_once __DIR__ . '/vendor/autoload.php';
+
 register_activation_hook(__FILE__, [Migration::class, 'migrate']);
 
 add_action('plugins_loaded', [Bootstrap::class, 'run']);
