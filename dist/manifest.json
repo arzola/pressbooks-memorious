@@ -1,0 +1,11 @@
+{
+  "resources/assets/js/pressbooks-borges.js": {
+    "file": "assets/app-BwXGQ0GB.js",
+    "name": "app",
+    "src": "resources/assets/js/pressbooks-borges.js",
+    "isEntry": true,
+    "css": [
+      "assets/app-D9r8wdjd.css"
+    ]
+  }
+}
