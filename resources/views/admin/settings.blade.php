@@ -1,10 +1,9 @@
 <div class="wrap">
     <h1>{{ __('Pressbooks Borges Search Settings', 'pressbooks-borges') }}</h1>
 
-    <form method="post" action="options.php">
-        {!! wp_nonce_field('pb_borges_settings_group-options', '_wpnonce', true, false) !!}
-        <input type="hidden" name="option_page" value="pb_borges_settings_group" />
-        <input type="hidden" name="action" value="update" />
+    <form method="post" action="{!! admin_url('admin.php') !!}">
+        {!! wp_nonce_field('pb_borges_save_settings', '_wpnonce', true, false) !!}
+        <input type="hidden" name="action" value="pb_borges_save_settings" />
 
         <table class="form-table">
             <tr>

@@ -18,7 +18,7 @@ class SearchAdmin
     public static function hooks(self $obj): void
     {
         add_action('network_admin_menu', [$obj, 'addMenu']);
-        add_action('admin_init', [$obj, 'registerSettings']);
+        add_action('admin_action_pb_borges_save_settings', [$obj, 'saveSettings']);
     }
 
     public static function getDefaults(): array
@@ -48,14 +48,6 @@ class SearchAdmin
         );
     }
 
-    public function registerSettings(): void
-    {
-        register_setting('pb_borges_settings_group', 'pb_borges_settings', [
-            'default' => self::getDefaults(),
-            'sanitize_callback' => [$this, 'sanitizeSettings'],
-        ]);
-    }
-
     public function sanitizeSettings(array $input): array
     {
         $defaults = self::getDefaults();
@@ -71,6 +63,27 @@ class SearchAdmin
             'max_retries' => absint($input['max_retries'] ?? $defaults['max_retries']),
             'batch_size' => absint($input['batch_size'] ?? $defaults['batch_size']),
         ];
+    }
+
+    public function saveSettings(): void
+    {
+        if (! check_admin_referer('pb_borges_save_settings')) {
+            wp_die(esc_html__('Nonce verification failed.', 'pressbooks-borges'));
+        }
+
+        if (! current_user_can('manage_network_options')) {
+            wp_die(esc_html__('Unauthorized.', 'pressbooks-borges'));
+        }
+
+        $input = $_POST['pb_borges_settings'] ?? [];
+        $sanitized = $this->sanitizeSettings($input);
+        update_site_option('pb_borges_settings', $sanitized);
+
+        wp_safe_redirect(add_query_arg([
+            'page' => 'pb-borges-settings',
+            'updated' => '1',
+        ], network_admin_url('settings.php')));
+        exit;
     }
 
     public function renderSettingsPage(): void
