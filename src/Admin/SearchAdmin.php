@@ -19,6 +19,8 @@ class SearchAdmin
     {
         add_action('network_admin_menu', [$obj, 'addMenu']);
         add_action('admin_action_pb_borges_save_settings', [$obj, 'saveSettings']);
+        add_action('wp_ajax_pb_borges_reindex_all', [$obj, 'ajaxReindexAll']);
+        add_action('wp_ajax_pb_borges_create_collections', [$obj, 'ajaxCreateCollections']);
     }
 
     public static function getDefaults(): array
@@ -91,6 +93,48 @@ class SearchAdmin
         echo \Pressbooks\Container::get('Blade')->render('PressbooksBorges::admin.settings', [
             'settings' => get_site_option('pb_borges_settings', self::getDefaults()),
             'defaults' => self::getDefaults(),
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('pb_borges_admin'),
         ]);
+    }
+
+    public function ajaxReindexAll(): void
+    {
+        check_ajax_referer('pb_borges_admin');
+
+        if (! current_user_can('manage_network_options')) {
+            wp_send_json_error(['message' => 'Unauthorized'], 403);
+        }
+
+        $search = \Pressbooks\Container::get('Borges\Search');
+        $sites = get_sites(['number' => 0]);
+
+        foreach ($sites as $site) {
+            $search->enqueueReindexBook((int) $site->blog_id);
+        }
+
+        wp_send_json_success([
+            'message' => sprintf(__('Queued %d books for reindexing.', 'pressbooks-borges'), count($sites)),
+            'count' => count($sites),
+        ]);
+    }
+
+    public function ajaxCreateCollections(): void
+    {
+        check_ajax_referer('pb_borges_admin');
+
+        if (! current_user_can('manage_network_options')) {
+            wp_send_json_error(['message' => 'Unauthorized'], 403);
+        }
+
+        try {
+            $search = \Pressbooks\Container::get('Borges\Search');
+            $search->ensureCollections();
+            wp_send_json_success([
+                'message' => __('Collections created successfully.', 'pressbooks-borges'),
+            ]);
+        } catch (\Throwable $e) {
+            wp_send_json_error(['message' => $e->getMessage()]);
+        }
     }
 }

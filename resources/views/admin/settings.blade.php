@@ -133,5 +133,67 @@
         @endif
 
         <?php submit_button(); ?>
-    </form>
+     </form>
 </div>
+
+<script>
+(function() {
+    var ajaxUrl = '{{ $ajax_url }}';
+    var nonce = '{{ $nonce }}';
+
+    document.getElementById('pb-borges-reindex-all').addEventListener('click', function() {
+        if (! confirm('Reindex all books? This may take a while.')) return;
+        var btn = this;
+        btn.disabled = true;
+        btn.textContent = 'Queuing...';
+
+        fetch(ajaxUrl + '?action=pb_borges_reindex_all&_ajax_nonce=' + nonce)
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    btn.textContent = data.data.message;
+                } else {
+                    btn.textContent = 'Error: ' + (data.data.message || 'Unknown error');
+                }
+                setTimeout(function() {
+                    btn.disabled = false;
+                    btn.textContent = 'Reindex All Books';
+                }, 5000);
+            })
+            .catch(function(err) {
+                btn.textContent = 'Request failed';
+                setTimeout(function() {
+                    btn.disabled = false;
+                    btn.textContent = 'Reindex All Books';
+                }, 3000);
+            });
+    });
+
+    document.getElementById('pb-borges-create-collections').addEventListener('click', function() {
+        var btn = this;
+        btn.disabled = true;
+        btn.textContent = 'Creating...';
+
+        fetch(ajaxUrl + '?action=pb_borges_create_collections&_ajax_nonce=' + nonce)
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    btn.textContent = data.data.message;
+                } else {
+                    btn.textContent = 'Error: ' + (data.data.message || 'Unknown error');
+                }
+                setTimeout(function() {
+                    btn.disabled = false;
+                    btn.textContent = 'Create Collections';
+                }, 5000);
+            })
+            .catch(function(err) {
+                btn.textContent = 'Request failed';
+                setTimeout(function() {
+                    btn.disabled = false;
+                    btn.textContent = 'Create Collections';
+                }, 3000);
+            });
+    });
+})();
+</script>
