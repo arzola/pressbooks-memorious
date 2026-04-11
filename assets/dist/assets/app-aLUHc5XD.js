@@ -91,4 +91,4 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
 							<div class="pb-beacon-result-meta">${A} · ${x.book_title??""}</div>
 							${_?`<p class="pb-beacon-result-snippet">${_}</p>`:""}
 						</div>`}}}),Mm({container:"#pb-beacon-pagination"})]),P.start(),E){const x=document.querySelector("#pb-beacon-searchbox input");x&&(x.value=E,x.dispatchEvent(new Event("input")))}}});
-//# sourceMappingURL=app-D_wA8rDH.js.map
+//# sourceMappingURL=app-aLUHc5XD.js.map

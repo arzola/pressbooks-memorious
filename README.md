@@ -1,7 +1,5 @@
 # Pressbooks Beacon
 
-![Pressbooks Beacon](assets/beacon.png)
-
 **Contributors:** arzola
 **Tags:** pressbooks, search, typesense, faceted-search
 **Requires at least:** 6.9
@@ -15,6 +13,26 @@ Fast, faceted search for Pressbooks multisite networks powered by [Typesense](ht
 ## Description
 
 Pressbooks Beacon adds instant, faceted search across all books in a Pressbooks multisite network. It indexes full chapter text, book metadata, and contributors into Typesense and provides a search UI in the WordPress admin bar.
+
+### Why Beacon?
+
+- **Typo-tolerant** — Built on Typesense's typo-tolerance engine. Misspell a word and still get relevant results. "ecology" matches "ecologi", "ecolgy", even "ecologii".
+- **Combined search** — Search by any combination of terms: a topic + an author name, a book title + a license type, a keyword + a contributor. Results are ranked by relevance across all your books at once.
+- **Instant results** — Sub-50ms search responses. Results appear as you type, grouped by sections, books, and contributors.
+- **Faceted filtering** — Narrow results by post type, book, author, license, or language with one click.
+- **Zero config search** — Content is indexed automatically as you edit. No manual reindexing needed (though full reindex is available via CLI).
+
+### Example
+
+<img src="docs/example.gif" alt="Example typesense" width="600">
+
+### Autocomplete
+
+<img src="docs/example.jpg" alt="Example autocomplete" width="600">
+
+### All results page
+
+<img src="docs/example1.jpg" alt="Example full view" width="600">
 
 ### What gets indexed
 
@@ -51,14 +69,23 @@ Pressbooks Beacon adds instant, faceted search across all books in a Pressbooks 
    composer require pressbooks/pressbooks-beacon
    ```
 3. Network-activate the plugin
-4. Go to **Network Admin → Settings → Beacon Search**
-5. Enter your Typesense connection details:
+4. Generate a search-only API key from your admin key:
+   ```bash
+   curl -H "X-TYPESENSE-API-KEY: YOUR_ADMIN_KEY" \
+     -X POST \
+     -H "Content-Type: application/json" \
+     -d '{"description": "Beacon search-only key", "actions": ["documents:search"], "collections": ["*"]}' \
+     http://localhost:8108/keys
+   ```
+   Copy the `value` from the response — this is your **Search API Key**.
+5. Go to **Network Admin → Settings → Beacon Search**
+6. Enter your Typesense connection details:
    - **Nodes** — comma-separated `host:port:protocol` (e.g. `typesense.example.com:443:https`)
    - **Admin API Key** — a key with full admin access (used for indexing, creating collections)
-   - **Search API Key** — a key used as the parent for scoped key derivation (can be the admin key in dev)
-6. Click **Reset Collections** to create the Typesense collections
-7. Click **Reindex All Books** to queue indexing jobs
-8. Run the job processor (see below)
+   - **Search API Key** — the search-only key you generated above (used as the parent for scoped key derivation)
+7. Click **Reset Collections** to create the Typesense collections
+8. Click **Reindex All Books** to queue indexing jobs
+9. Run the job processor (see below)
 
 ### Local Development (Lando)
 
@@ -99,8 +126,14 @@ Pressbooks Beacon adds instant, faceted search across all books in a Pressbooks 
 
 6. Network-activate the plugin, then go to **Network Admin → Settings → Beacon Search** and configure:
    - **Nodes**: `localhost:8108:http`
-   - **Admin API Key**: `pb-dev-admin-key`
-   - **Search API Key**: `pb-dev-admin-key`
+    - **Admin API Key**: `pb-dev-admin-key`
+    - **Search API Key**: generate one using the admin key:
+      ```bash
+      curl -s -H "X-TYPESENSE-API-KEY: pb-dev-admin-key" \
+        -X POST -H "Content-Type: application/json" \
+        -d '{"description":"Beacon dev search key","actions":["documents:search"],"collections":["*"]}' \
+        http://localhost:8108/keys | jq -r '.value'
+      ```
 
 7. If you access your site through ngrok or another tunnel, the browser needs a publicly reachable Typesense URL. Start a tunnel:
    ```bash

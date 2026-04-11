@@ -78,6 +78,7 @@
 	display: flex;
 	align-items: center;
 	height: 32px;
+	border: 0 !important;
 }
 
 .pb-beacon-icon-btn {
@@ -87,12 +88,14 @@
 	width: 32px;
 	height: 32px;
 	cursor: pointer;
-	color: #a7aaad;
+	color: #fff;
 	transition: color 0.2s ease;
+	border: 0;
 }
 
 .pb-beacon-icon-btn:hover {
-	color: #72aee6;
+	color: var(--beacon-accent);
+	background-color: var(--beacon-bg);
 }
 
 /* ─── Search bar ────────────────────────────────────── */
