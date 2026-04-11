@@ -38,6 +38,9 @@ document.addEventListener( 'DOMContentLoaded', () => {
 
 	let searchBar, searchInput, dropdown;
 
+	/**
+	 *
+	 */
 	function openSearch() {
 		if ( ! searchBar ) return;
 		searchBar.classList.add( 'open' );
@@ -45,6 +48,9 @@ document.addEventListener( 'DOMContentLoaded', () => {
 		setTimeout( () => searchInput.focus(), 100 );
 	}
 
+	/**
+	 *
+	 */
 	function closeSearch() {
 		if ( ! searchBar ) return;
 		searchBar.classList.remove( 'open' );
@@ -53,6 +59,9 @@ document.addEventListener( 'DOMContentLoaded', () => {
 		iconBtn?.setAttribute( 'aria-expanded', 'false' );
 	}
 
+	/**
+	 *
+	 */
 	function toggleSearch() {
 		if ( searchBar?.classList.contains( 'open' ) ) {
 			closeSearch();
@@ -330,6 +339,11 @@ document.addEventListener( 'DOMContentLoaded', () => {
 		search.addWidgets( [
 			searchBox( {
 				container: '#pb-beacon-searchbox',
+				/**
+				 *
+				 * @param query
+				 * @param search
+				 */
 				queryHook( query, search ) {
 					search( query );
 				},
@@ -356,6 +370,10 @@ document.addEventListener( 'DOMContentLoaded', () => {
 			hits( {
 				container: '#pb-beacon-hits',
 				templates: {
+					/**
+					 *
+					 * @param hit
+					 */
 					item( hit ) {
 						const raw = hit._highlightResult?.content?.value ?? '';
 						const snippet = raw ? truncateSnippet( raw, 180 ) : '';

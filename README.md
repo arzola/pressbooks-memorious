@@ -1,12 +1,19 @@
 # Pressbooks Beacon
 
 **Contributors:** arzola
+
 **Tags:** pressbooks, search, typesense, faceted-search
+
 **Requires at least:** 6.9
+
 **Tested up to:** 6.9
+
 **Requires PHP:** 8.3
+
 **License:** GPLv3 or later
+
 **License URI:** https://www.gnu.org/licenses/gpl-3.0.html
+
 
 Fast, faceted search for Pressbooks multisite networks powered by [Typesense](https://typesense.org).
 
@@ -22,7 +29,7 @@ Pressbooks Beacon adds instant, faceted search across all books in a Pressbooks 
 - **Faceted filtering** — Narrow results by post type, book, author, license, or language with one click.
 - **Zero config search** — Content is indexed automatically as you edit. No manual reindexing needed (though full reindex is available via CLI).
 
-### Example
+### Demo
 
 <img src="docs/example.gif" alt="Example typesense" width="600">
 
@@ -329,6 +336,10 @@ pressbooks-beacon/
     │   └── SearchBarTest.php
     └── TestCase.php
 ```
+
+## Contributing
+
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ## Changelog
 
