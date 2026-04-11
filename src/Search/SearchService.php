@@ -1,11 +1,11 @@
 <?php
 
-namespace PressbooksBorges\Search;
+namespace PressbooksBeacon\Search;
 
-use PressbooksBorges\Indexing\IndexJobProcessor;
-use PressbooksBorges\Indexing\Indexers\BooksIndexer;
-use PressbooksBorges\Indexing\Indexers\ContributorsIndexer;
-use PressbooksBorges\Indexing\Indexers\SectionsIndexer;
+use PressbooksBeacon\Indexing\IndexJobProcessor;
+use PressbooksBeacon\Indexing\Indexers\BooksIndexer;
+use PressbooksBeacon\Indexing\Indexers\ContributorsIndexer;
+use PressbooksBeacon\Indexing\Indexers\SectionsIndexer;
 
 class SearchService
 {
@@ -23,7 +23,7 @@ class SearchService
 
     public function getIndexers(): array
     {
-        return apply_filters('pb_borges_indexers', [
+        return apply_filters('pb_beacon_indexers', [
             new SectionsIndexer,
             new BooksIndexer,
             new ContributorsIndexer,

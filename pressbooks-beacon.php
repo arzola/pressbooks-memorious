@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Plugin Name: Pressbooks Borges
+ * Plugin Name: Pressbooks Beacon
  * Plugin URI: https://pressbooks.org
  * Requires at least: 6.8
  * Requires Plugins: pressbooks
@@ -13,13 +13,13 @@
  * Author URI: https://pressbooks.org
  * Requires PHP: 8.3
  * Pressbooks tested up to: 6.16.0
- * Text Domain: pressbooks-borges
+ * Text Domain: pressbooks-beacon
  * License: GPL v3 or later
  * Network: True
  */
 
-use PressbooksBorges\Bootstrap;
-use PressbooksBorges\Database\Migration;
+use PressbooksBeacon\Bootstrap;
+use PressbooksBeacon\Database\Migration;
 
 require_once __DIR__ . '/vendor/autoload.php';
 

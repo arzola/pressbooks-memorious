@@ -1,9 +1,8 @@
 <?php
 
-namespace PressbooksBorges\Api;
+namespace PressbooksBeacon\Api;
 
-use PressbooksBorges\Search\KeyGenerator;
-use PressbooksBorges\Search\TypesenseClient;
+use PressbooksBeacon\Search\TypesenseClient;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
@@ -17,7 +16,7 @@ class SearchEndpoint
 
     public static function registerRoutes(): void
     {
-        register_rest_route('pressbooks-borges/v1', '/search', [
+        register_rest_route('pressbooks-beacon/v1', '/search', [
             [
                 'methods' => WP_REST_Server::READABLE,
                 'callback' => [self::class, 'handleSearch'],
@@ -38,7 +37,7 @@ class SearchEndpoint
         if (empty($q) || strlen($q) < 2) {
             return new WP_REST_Response([
                 'code' => 'invalid_query',
-                'message' => __('Query must be at least 2 characters.', 'pressbooks-borges'),
+                'message' => __('Query must be at least 2 characters.', 'pressbooks-beacon'),
             ], 400);
         }
 
@@ -47,14 +46,8 @@ class SearchEndpoint
         $page = max((int) ($request->get_param('page') ?? 1), 1);
 
         $userId = get_current_user_id();
-        $currentBlogId = ($collection === 'webbook') ? get_current_blog_id() : null;
-
         $client = TypesenseClient::fromSettings();
-        $searchKey = $userId
-            ? KeyGenerator::generateSearchKey($userId, $currentBlogId)
-            : KeyGenerator::generateAnonymousKey(get_current_blog_id());
 
-        $searchRequests = [];
         $validCollections = ['pb_sections', 'pb_books', 'pb_contributors'];
 
         if ($collection === 'all') {
@@ -65,6 +58,7 @@ class SearchEndpoint
                 : $validCollections;
         }
 
+        $searchRequests = [];
         foreach ($targetCollections as $col) {
             $searchRequests['searches'][] = [
                 'collection' => $col,

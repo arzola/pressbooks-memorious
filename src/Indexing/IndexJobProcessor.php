@@ -1,15 +1,15 @@
 <?php
 
-namespace PressbooksBorges\Indexing;
+namespace PressbooksBeacon\Indexing;
 
 class IndexJobProcessor
 {
     public static function register(): void
     {
-        add_action('pb_borges_index_processor', [self::class, 'processQueue']);
+        add_action('pb_beacon_index_processor', [self::class, 'processQueue']);
 
-        if (! wp_next_scheduled('pb_borges_index_processor')) {
-            wp_schedule_event(time(), 'every_minute', 'pb_borges_index_processor');
+        if (! wp_next_scheduled('pb_beacon_index_processor')) {
+            wp_schedule_event(time(), 'every_minute', 'pb_beacon_index_processor');
         }
     }
 
@@ -17,7 +17,7 @@ class IndexJobProcessor
     {
         $payloadJson = ! empty($payload) ? wp_json_encode($payload) : null;
 
-        $existing = app('db')->table('pressbooks_borges_index_jobs')
+        $existing = app('db')->table('pressbooks_beacon_index_jobs')
             ->where('blog_id', $blogId)
             ->where('job_type', $jobType)
             ->where('status', 'pending')
@@ -25,13 +25,13 @@ class IndexJobProcessor
             ->first();
 
         if ($existing) {
-            app('db')->table('pressbooks_borges_index_jobs')
+            app('db')->table('pressbooks_beacon_index_jobs')
                 ->where('id', $existing->id)
                 ->update(['updated_at' => current_time('mysql', true)]);
             return;
         }
 
-        app('db')->table('pressbooks_borges_index_jobs')->insert([
+        app('db')->table('pressbooks_beacon_index_jobs')->insert([
             'blog_id' => $blogId,
             'job_type' => $jobType,
             'payload' => $payloadJson,
@@ -44,7 +44,7 @@ class IndexJobProcessor
 
     public static function getPendingJobs(int $limit = 50): array
     {
-        return app('db')->table('pressbooks_borges_index_jobs')
+        return app('db')->table('pressbooks_beacon_index_jobs')
             ->where('status', 'pending')
             ->orderBy('created_at', 'asc')
             ->limit($limit)
@@ -54,7 +54,7 @@ class IndexJobProcessor
 
     public static function markProcessing(int $jobId): void
     {
-        app('db')->table('pressbooks_borges_index_jobs')
+        app('db')->table('pressbooks_beacon_index_jobs')
             ->where('id', $jobId)
             ->update([
                 'status' => 'processing',
@@ -64,7 +64,7 @@ class IndexJobProcessor
 
     public static function markCompleted(int $jobId): void
     {
-        app('db')->table('pressbooks_borges_index_jobs')
+        app('db')->table('pressbooks_beacon_index_jobs')
             ->where('id', $jobId)
             ->update([
                 'status' => 'completed',
@@ -75,17 +75,17 @@ class IndexJobProcessor
 
     public static function markFailed(int $jobId, string $errorMessage): void
     {
-        $job = app('db')->table('pressbooks_borges_index_jobs')->find($jobId);
+        $job = app('db')->table('pressbooks_beacon_index_jobs')->find($jobId);
         if (! $job) {
             return;
         }
 
-        $settings = get_site_option('pb_borges_settings', []);
+        $settings = get_site_option('pb_beacon_settings', []);
         $maxRetries = $settings['max_retries'] ?? 3;
         $newAttempts = $job->attempts + 1;
 
         if ($newAttempts < $maxRetries) {
-            app('db')->table('pressbooks_borges_index_jobs')
+            app('db')->table('pressbooks_beacon_index_jobs')
                 ->where('id', $jobId)
                 ->update([
                     'status' => 'pending',
@@ -94,7 +94,7 @@ class IndexJobProcessor
                     'updated_at' => current_time('mysql', true),
                 ]);
         } else {
-            app('db')->table('pressbooks_borges_index_jobs')
+            app('db')->table('pressbooks_beacon_index_jobs')
                 ->where('id', $jobId)
                 ->update([
                     'status' => 'failed',
@@ -104,13 +104,13 @@ class IndexJobProcessor
                     'updated_at' => current_time('mysql', true),
                 ]);
 
-            do_action('pb_borges_job_failed', $jobId, $errorMessage);
+            do_action('pb_beacon_job_failed', $jobId, $errorMessage);
         }
     }
 
     public static function processQueue(): void
     {
-        $settings = get_site_option('pb_borges_settings', []);
+        $settings = get_site_option('pb_beacon_settings', []);
         $batchSize = $settings['batch_size'] ?? 50;
 
         $jobs = self::getPendingJobs($batchSize);
@@ -126,12 +126,12 @@ class IndexJobProcessor
         }
     }
 
-    private static function processJob(object $job): void
+    public static function processJob(object $job): void
     {
-        $client = \PressbooksBorges\Search\TypesenseClient::fromSettings();
+        $client = \PressbooksBeacon\Search\TypesenseClient::fromSettings();
         $payload = $job->payload ? json_decode($job->payload, true) : [];
 
-        $indexers = apply_filters('pb_borges_indexers', [
+        $indexers = apply_filters('pb_beacon_indexers', [
             new Indexers\SectionsIndexer,
             new Indexers\BooksIndexer,
             new Indexers\ContributorsIndexer,
@@ -209,7 +209,7 @@ class IndexJobProcessor
                 $termId = $payload['term_id'] ?? null;
                 if ($termId) {
                     try {
-                        $client->getClient()->collections['pb_contributors']->documents["contributor_{$termId}"]->delete();
+                        $client->getClient()->collections['pb_contributors']->documents["contributor_0_{$termId}"]->delete();
                     } catch (\Throwable $e) {
                         if (! str_contains($e->getMessage(), '404')) {
                             throw $e;
@@ -219,7 +219,7 @@ class IndexJobProcessor
                 break;
 
             case 'reindex_book':
-                do_action('pb_borges_reindex_started', $job->blog_id);
+                do_action('pb_beacon_reindex_started', $job->blog_id);
                 try {
                     $client->getClient()->collections['pb_sections']->documents->delete(['filter_by' => "blog_id:{$job->blog_id}"]);
                 } catch (\Throwable $e) {
@@ -256,10 +256,23 @@ class IndexJobProcessor
                         }
                     }
                 }
+                foreach ($indexers as $indexer) {
+                    if ($indexer->getCollectionName() === 'pb_contributors' && method_exists($indexer, 'getContributorsForBlog')) {
+                        try {
+                            $client->getClient()->collections['pb_contributors']->documents->delete(['filter_by' => "blog_ids:{$job->blog_id}"]);
+                        } catch (\Throwable $e) {
+                            // Ignore 404s
+                        }
+                        $contributorDocs = $indexer->getContributorsForBlog($job->blog_id);
+                        if (! empty($contributorDocs)) {
+                            $client->getClient()->collections['pb_contributors']->documents->import($contributorDocs, ['action' => 'upsert']);
+                        }
+                    }
+                }
                 if ($switched) {
                     restore_current_blog();
                 }
-                do_action('pb_borges_reindex_completed', $job->blog_id);
+                do_action('pb_beacon_reindex_completed', $job->blog_id);
                 break;
         }
     }

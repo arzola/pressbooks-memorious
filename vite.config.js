@@ -3,7 +3,7 @@ import { resolve } from 'path';
 
 export default createWpViteConfig({
 	input: {
-		app: resolve(__dirname, 'resources/assets/js/pressbooks-borges.js'),
+		app: resolve(__dirname, 'assets/src/scripts/pressbooks-beacon.js'),
 	},
-	outDir: 'dist',
+	outDir: 'assets/dist',
 });

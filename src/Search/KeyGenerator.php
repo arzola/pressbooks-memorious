@@ -1,28 +1,30 @@
 <?php
 
-namespace PressbooksBorges\Search;
+namespace PressbooksBeacon\Search;
 
 class KeyGenerator
 {
     public static function generateSearchKey(int $userId, ?int $currentBlogId = null): string
     {
-        $settings = get_site_option('pb_borges_settings', []);
+        $settings = get_site_option('pb_beacon_settings', []);
         $parentKey = $settings['typesense_search_key'] ?? '';
 
-        $cacheKey = "pb_borges_key_{$userId}_" . md5(json_encode($currentBlogId));
+        $blogIds = self::getUserBlogIds($userId);
+        $cacheKey = "pb_beacon_key_{$userId}_" . md5(json_encode($blogIds));
         $cached = get_transient($cacheKey);
         if ($cached !== false) {
             return $cached;
         }
 
-        $filterBy = $currentBlogId !== null
-            ? self::buildWebbookFilter($currentBlogId, is_user_logged_in())
-            : self::buildAdminFilter(self::getUserBlogIds($userId));
+        $filterBy = self::buildAdminFilter($blogIds);
 
-        $scopedKey = self::deriveScopedKey($parentKey, [
-            'filter_by' => $filterBy,
-            'expires_at' => time() + 3600,
-        ]);
+        $parameters = [];
+        if ($filterBy) {
+            $parameters['filter_by'] = $filterBy;
+        }
+        $parameters['expires_at'] = time() + 3600;
+
+        $scopedKey = self::deriveScopedKey($parentKey, $parameters);
 
         set_transient($cacheKey, $scopedKey, 50 * MINUTE_IN_SECONDS);
 
@@ -33,21 +35,7 @@ class KeyGenerator
     {
         $ids = implode(',', $blogIds);
 
-        return "blog_id:=[{$ids}] && post_status:=[publish,private,draft]";
-    }
-
-    public static function buildWebbookFilter(int $blogId, bool $isLoggedIn): string
-    {
-        if ($isLoggedIn) {
-            return "blog_id:={$blogId} && post_status:=[publish,web-only]";
-        }
-
-        return self::buildAnonymousFilter($blogId);
-    }
-
-    public static function buildAnonymousFilter(int $blogId): string
-    {
-        return "blog_id:={$blogId} && post_status:=publish";
+        return "blog_id:=[{$ids}]";
     }
 
     public static function getUserBlogIds(int $userId): array
@@ -59,14 +47,16 @@ class KeyGenerator
 
     private static function deriveScopedKey(string $parentKey, array $parameters): string
     {
-        $parameters['expires_at'] = (int) ($parameters['expires_at'] ?? time() + 3600);
-        ksort($parameters);
+        $paramStr = json_encode($parameters, JSON_THROW_ON_ERROR);
 
-        $base64 = base64_encode(json_encode($parameters));
-        $base64 = rtrim($base64, '=');
+        $digest = base64_encode(
+            hash_hmac('sha256', $paramStr, $parentKey, true)
+        );
 
-        $hmac = hash_hmac('sha256', $base64, $parentKey);
+        $keyPrefix = substr($parentKey, 0, 4);
 
-        return "{$hmac}{$base64}";
+        $raw = $digest . $keyPrefix . $paramStr;
+
+        return base64_encode($raw);
     }
 }

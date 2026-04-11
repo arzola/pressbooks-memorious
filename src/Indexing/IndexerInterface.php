@@ -1,6 +1,6 @@
 <?php
 
-namespace PressbooksBorges\Indexing;
+namespace PressbooksBeacon\Indexing;
 
 interface IndexerInterface
 {
@@ -8,7 +8,7 @@ interface IndexerInterface
 
     public function getPostTypes(): array;
 
-    public function transformDocument(int $blogId, int $postId): ?array;
+    public function transformDocument(int $blogId, int $postId = 0, ?int $termId = null): ?array;
 
-    public function deleteDocument(int $blogId, int $postId): ?string;
+    public function deleteDocument(int $blogId, int $postId = 0, ?int $termId = null): ?string;
 }

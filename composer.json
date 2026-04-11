@@ -1,9 +1,9 @@
 {
-	"name": "pressbooks/pressbooks-borges",
+	"name": "pressbooks/pressbooks-beacon",
 	"license": "GPL-3.0-or-later",
 	"type": "wordpress-plugin",
 	"description": "Fast, faceted search for Pressbooks networks powered by Typesense.",
-	"homepage": "https://github.com/pressbooks/pressbooks-borges",
+	"homepage": "https://github.com/pressbooks/pressbooks-beacon",
 	"authors": [
 		{
 			"name": "Book Oven Inc.",
@@ -19,17 +19,18 @@
 	],
 	"support": {
 		"email": "code@pressbooks.com",
-		"issues": "https://github.com/pressbooks/pressbooks-borges/issues/",
-		"source": "https://github.com/pressbooks/pressbooks-borges/"
+		"issues": "https://github.com/pressbooks/pressbooks-beacon/issues/",
+		"source": "https://github.com/pressbooks/pressbooks-beacon/"
 	},
 	"config": {
 		"allow-plugins": {
-			"composer/installers": true
+			"composer/installers": true,
+			"php-http/discovery": true
 		}
 	},
 	"autoload": {
 		"psr-4": {
-			"PressbooksBorges\\": "src/"
+			"PressbooksBeacon\\": "src/"
 		}
 	},
 	"autoload-dev": {

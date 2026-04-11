@@ -1,6 +1,6 @@
 <?php
 
-namespace PressbooksBorges\Search;
+namespace PressbooksBeacon\Search;
 
 use Typesense\Client;
 
@@ -42,21 +42,29 @@ class TypesenseClient
 
     public static function fromSettings(): self
     {
-        $settings = get_site_option('pb_borges_settings', []);
-
-        $nodes = array_map(function (string $node) {
-            [$host, $port, $protocol] = explode(':', $node, 3);
-            return [
-                'host' => $host,
-                'port' => (int) $port,
-                'protocol' => $protocol,
-            ];
-        }, explode(',', $settings['typesense_nodes'] ?? ''));
+        $settings = get_site_option('pb_beacon_settings', []);
 
         return new self(
-            nodes: $nodes,
+            nodes: self::parseNodes($settings['typesense_nodes'] ?? ''),
             adminApiKey: $settings['typesense_admin_key'] ?? '',
             searchOnlyKey: $settings['typesense_search_key'] ?? null,
         );
+    }
+
+    public static function parseNodes(string $nodesStr): array
+    {
+        if (empty($nodesStr)) {
+            return [];
+        }
+
+        return array_map(function (string $node) {
+            $parts = explode(':', $node, 3);
+
+            return [
+                'host' => $parts[0] ?? 'localhost',
+                'port' => (int) ($parts[1] ?? 443),
+                'protocol' => $parts[2] ?? 'https',
+            ];
+        }, array_filter(array_map('trim', explode(',', $nodesStr))));
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace PressbooksBorges\Search;
+namespace PressbooksBeacon\Search;
 
 class Collections
 {
@@ -22,8 +22,10 @@ class Collections
                 ['name' => 'language', 'type' => 'string', 'facet' => true, 'optional' => true],
                 ['name' => 'parent_id', 'type' => 'int64', 'optional' => true],
                 ['name' => 'menu_order', 'type' => 'int32', 'optional' => true],
-                ['name' => 'book_title', 'type' => 'string', 'optional' => true],
+                ['name' => 'book_title', 'type' => 'string', 'facet' => true, 'optional' => true],
                 ['name' => 'book_url', 'type' => 'string', 'optional' => true],
+                ['name' => 'edit_url', 'type' => 'string', 'optional' => true],
+                ['name' => 'view_url', 'type' => 'string', 'optional' => true],
                 ['name' => 'updated_at', 'type' => 'int64', 'sort' => true],
             ],
             'default_sorting_field' => 'updated_at',
@@ -83,6 +85,6 @@ class Collections
             'pb_contributors' => self::contributors(),
         ];
 
-        return apply_filters('pb_borges_collections', $core);
+        return apply_filters('pb_beacon_collections', $core);
     }
 }

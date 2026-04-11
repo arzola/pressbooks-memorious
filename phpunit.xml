@@ -15,7 +15,7 @@
 		</include>
 	</coverage>
 	<testsuites>
-		<testsuite name="Pressbooks Borges">
+		<testsuite name="Pressbooks Beacon">
 			<directory suffix="Test.php">./tests/</directory>
 		</testsuite>
 	</testsuites>

@@ -1,19 +1,19 @@
 {
-  "name": "pressbooks-borges",
+  "name": "pressbooks-beacon",
   "description": "Fast, faceted search for Pressbooks networks powered by Typesense.",
   "type": "module",
   "scripts": {
     "build": "pressbooks-build-tools build",
     "watch": "pressbooks-build-tools dev",
-    "lint:scripts": "pressbooks-build-tools lint:scripts 'resources/assets/js/**/*.js'",
-    "lint:styles": "pressbooks-build-tools lint:styles 'resources/assets/styles/**/*.css'",
-    "fix:scripts": "pressbooks-build-tools fix:scripts 'resources/assets/js/**/*.js'",
-    "fix:styles": "pressbooks-build-tools fix:styles 'resources/assets/styles/**/*.css'",
+    "lint:scripts": "pressbooks-build-tools lint:scripts 'assets/src/scripts/**/*.js'",
+    "lint:styles": "pressbooks-build-tools lint:styles 'assets/src/styles/**/*.css'",
+    "fix:scripts": "pressbooks-build-tools fix:scripts 'assets/src/scripts/**/*.js'",
+    "fix:styles": "pressbooks-build-tools fix:styles 'assets/src/styles/**/*.css'",
     "lint": "npm run lint:scripts && npm run lint:styles"
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/pressbooks/pressbooks-borges.git"
+    "url": "git+ssh://git@github.com/pressbooks/pressbooks-beacon.git"
   },
   "keywords": [
     "wordpress-plugin",
@@ -24,9 +24,9 @@
   "author": "Pressbooks (Book Oven Inc.)",
   "license": "GPL-3.0-or-later",
   "bugs": {
-    "url": "https://github.com/pressbooks/pressbooks-borges/issues"
+    "url": "https://github.com/pressbooks/pressbooks-beacon/issues"
   },
-  "homepage": "https://github.com/pressbooks/pressbooks-borges#readme",
+  "homepage": "https://github.com/pressbooks/pressbooks-beacon#readme",
   "dependencies": {
     "typesense-instantsearch-adapter": "^2.0",
     "instantsearch.js": "^4.0"

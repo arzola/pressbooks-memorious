@@ -1,6 +1,6 @@
 <?php
 
-namespace PressbooksBorges\Interfaces;
+namespace PressbooksBeacon\Interfaces;
 
 interface MigrationInterface
 {

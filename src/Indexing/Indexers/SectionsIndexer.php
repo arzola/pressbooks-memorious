@@ -1,8 +1,8 @@
 <?php
 
-namespace PressbooksBorges\Indexing\Indexers;
+namespace PressbooksBeacon\Indexing\Indexers;
 
-use PressbooksBorges\Indexing\IndexerInterface;
+use PressbooksBeacon\Indexing\IndexerInterface;
 
 class SectionsIndexer implements IndexerInterface
 {
@@ -16,7 +16,7 @@ class SectionsIndexer implements IndexerInterface
         return ['chapter', 'front-matter', 'back-matter', 'glossary'];
     }
 
-    public function transformDocument(int $blogId, int $postId): ?array
+    public function transformDocument(int $blogId, int $postId = 0, ?int $termId = null): ?array
     {
         $switched = false;
         if (get_current_blog_id() !== $blogId) {
@@ -62,6 +62,9 @@ class SectionsIndexer implements IndexerInterface
         $content = wp_strip_all_tags($post->post_content);
         $content = preg_replace('/\s+/', ' ', $content);
 
+        $editUrl = admin_url("post.php?post={$postId}&action=edit");
+        $viewUrl = get_permalink($postId);
+
         $document = [
             'id' => "{$blogId}_{$postId}",
             'blog_id' => $blogId,
@@ -78,6 +81,8 @@ class SectionsIndexer implements IndexerInterface
             'menu_order' => $post->menu_order,
             'book_title' => $bookTitle,
             'book_url' => $bookUrl,
+            'edit_url' => $editUrl ?: null,
+            'view_url' => $viewUrl ?: null,
             'updated_at' => strtotime($post->post_modified_gmt) ?: time(),
         ];
 
@@ -88,7 +93,7 @@ class SectionsIndexer implements IndexerInterface
         return $document;
     }
 
-    public function deleteDocument(int $blogId, int $postId): ?string
+    public function deleteDocument(int $blogId, int $postId = 0, ?int $termId = null): ?string
     {
         return "{$blogId}_{$postId}";
     }

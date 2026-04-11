@@ -1,8 +1,8 @@
 <?php
 
-namespace PressbooksBorges\Indexing\Indexers;
+namespace PressbooksBeacon\Indexing\Indexers;
 
-use PressbooksBorges\Indexing\IndexerInterface;
+use PressbooksBeacon\Indexing\IndexerInterface;
 
 class ContributorsIndexer implements IndexerInterface
 {
@@ -28,23 +28,17 @@ class ContributorsIndexer implements IndexerInterface
             return null;
         }
 
-        $contributorTypes = [];
-        $termMeta = get_term_meta($term->term_id);
-        foreach ($termMeta as $key => $values) {
-            if (str_starts_with($key, 'pb_contributor_') && ! empty($values[0])) {
-                $contributorTypes[] = str_replace('pb_contributor_', '', $key);
-            }
-        }
+        $contributorTypes = $this->detectContributorTypes($term->term_id);
 
         $document = [
-            'id' => "contributor_{$term->term_id}",
+            'id' => "contributor_{$blogId}_{$term->term_id}",
             'term_id' => $term->term_id,
             'name' => $term->name,
             'slug' => $term->slug,
             'contributor_type' => $contributorTypes,
             'description' => $term->description ?: null,
-            'blog_ids' => [],
-            'book_count' => 0,
+            'blog_ids' => [$blogId],
+            'book_count' => 1,
             'section_count' => 0,
         ];
 
@@ -57,6 +51,109 @@ class ContributorsIndexer implements IndexerInterface
             return null;
         }
 
-        return "contributor_{$termId}";
+        return "contributor_{$blogId}_{$termId}";
+    }
+
+    public function getContributorsForBlog(int $blogId): array
+    {
+        $switched = false;
+        if (get_current_blog_id() !== $blogId) {
+            switch_to_blog($blogId);
+            $switched = true;
+        }
+
+        $terms = get_terms([
+            'taxonomy' => 'contributor',
+            'hide_empty' => false,
+            'number' => 0,
+        ]);
+
+        if (is_wp_error($terms) || empty($terms)) {
+            if ($switched) {
+                restore_current_blog();
+            }
+            return [];
+        }
+
+        $docs = [];
+        foreach ($terms as $term) {
+            $contributorTypes = $this->detectContributorTypes($term->term_id);
+            $linkedPosts = $this->getLinkedPostCount($term->term_id);
+
+            $docs[] = [
+                'id' => "contributor_{$blogId}_{$term->term_id}",
+                'term_id' => $term->term_id,
+                'name' => $term->name,
+                'slug' => $term->slug,
+                'contributor_type' => $contributorTypes,
+                'description' => $term->description ?: null,
+                'blog_ids' => [$blogId],
+                'book_count' => $linkedPosts > 0 ? 1 : 0,
+                'section_count' => $linkedPosts,
+            ];
+        }
+
+        if ($switched) {
+            restore_current_blog();
+        }
+
+        return $docs;
+    }
+
+    private function detectContributorTypes(int $termId): array
+    {
+        $types = [];
+        $typeMetaKeys = [
+            'pb_authors' => 'author',
+            'pb_editors' => 'editor',
+            'pb_contributors' => 'contributor',
+            'pb_translators' => 'translator',
+            'pb_reviewers' => 'reviewer',
+            'pb_illustrators' => 'illustrator',
+        ];
+
+        $slug = get_term($termId, 'contributor')->slug ?? '';
+        if (empty($slug)) {
+            return $types;
+        }
+
+        foreach ($typeMetaKeys as $metaKey => $label) {
+            $existing = get_posts([
+                'post_type' => ['chapter', 'front-matter', 'back-matter', 'metadata'],
+                'posts_per_page' => 1,
+                'meta_key' => $metaKey,
+                'meta_value' => $slug,
+                'fields' => 'ids',
+            ]);
+            if (! empty($existing)) {
+                $types[] = $label;
+            }
+        }
+
+        return $types;
+    }
+
+    private function getLinkedPostCount(int $termId): int
+    {
+        $postTypes = ['chapter', 'front-matter', 'back-matter', 'glossary', 'metadata', 'part'];
+
+        $count = 0;
+        foreach ($postTypes as $pt) {
+            $posts = get_posts([
+                'post_type' => $pt,
+                'posts_per_page' => -1,
+                'tax_query' => [
+                    [
+                        'taxonomy' => 'contributor',
+                        'field' => 'term_id',
+                        'terms' => $termId,
+                    ],
+                ],
+                'fields' => 'ids',
+            ]);
+            $count += count($posts);
+        }
+
+        return $count;
     }
 }

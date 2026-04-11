@@ -1,8 +1,11 @@
 <?php
 
-namespace PressbooksBorges\Admin;
+namespace PressbooksBeacon\Admin;
 
-use PressbooksBorges\Search\KeyGenerator;
+use PressbooksBeacon\Search\KeyGenerator;
+use PressbooksBeacon\Search\TypesenseClient;
+use PressbooksFrontendTools\Assets;
+use PressbooksFrontendTools\AssetType;
 
 class SearchBar
 {
@@ -14,102 +17,62 @@ class SearchBar
     public static function enqueueAssets(): void
     {
         add_action('admin_enqueue_scripts', [self::class, 'enqueueAdminAssets']);
-        add_action('wp_enqueue_scripts', [self::class, 'enqueueWebbookAssets']);
     }
 
     public static function addSearchBar(\WP_Admin_Bar $wpAdminBar): void
     {
-        $settings = get_site_option('pb_borges_settings', []);
+        $settings = get_site_option('pb_beacon_settings', []);
 
-        if (empty($settings['typesense_nodes'])) {
-            return;
-        }
-
-        if (is_admin() && empty($settings['enabled_admin'])) {
-            return;
-        }
-
-        if (! is_admin() && empty($settings['enabled_webbook'])) {
+        if (empty($settings['typesense_nodes']) || empty($settings['enabled_admin'])) {
             return;
         }
 
         $wpAdminBar->add_node([
-            'id' => 'pb-borges-search',
-            'title' => '<input type="text" id="pb-borges-search-input" placeholder="' . esc_attr__('Search books and content...', 'pressbooks-borges') . '" />',
-            'href' => '#',
+            'id' => 'pb-beacon-search',
+            'parent' => 'top-secondary',
+            'title' => '<span class="pb-beacon-icon-btn" role="button" tabindex="0" aria-label="' . esc_attr__('Search', 'pressbooks-beacon') . '" aria-expanded="false" aria-controls="pb-beacon-search-bar"><i class="pb-heroicons pb-heroicons-outline_magnifying-glass"></i></span>',
+            'href' => false,
+            'meta' => [
+                'tabindex' => 0,
+            ],
         ]);
     }
 
     public static function enqueueAdminAssets(): void
     {
-        $settings = get_site_option('pb_borges_settings', []);
+        $settings = get_site_option('pb_beacon_settings', []);
         if (empty($settings['typesense_nodes']) || empty($settings['enabled_admin'])) {
             return;
         }
 
-        self::doEnqueue('admin');
+        self::doEnqueue();
     }
 
-    public static function enqueueWebbookAssets(): void
+    private static function doEnqueue(): void
     {
-        if (! function_exists('\\Pressbooks\\Book::isBook') || ! \Pressbooks\Book::isBook()) {
-            return;
-        }
-
-        $settings = get_site_option('pb_borges_settings', []);
-        if (empty($settings['typesense_nodes']) || empty($settings['enabled_webbook'])) {
-            return;
-        }
-
-        self::doEnqueue('webbook');
-    }
-
-    private static function doEnqueue(string $context): void
-    {
-        $handle = 'pressbooks-borges';
-        $manifestPath = WP_PLUGIN_DIR . '/pressbooks-borges/dist/manifest.json';
-
-        if (! file_exists($manifestPath)) {
-            return;
-        }
-
-        $manifest = json_decode(file_get_contents($manifestPath), true);
-        $entry = $manifest['resources/assets/js/pressbooks-borges.js'] ?? null;
-
-        if (! $entry) {
-            return;
-        }
-
-        $baseUrl = plugins_url('dist', WP_PLUGIN_DIR . '/pressbooks-borges/pressbooks-borges.php');
-        $pluginUrl = plugins_url('pressbooks-borges/dist');
-
-        if (! empty($entry['css'])) {
-            foreach ($entry['css'] as $css) {
-                wp_enqueue_style($handle . '-style', $pluginUrl . '/' . $css, [], null);
-            }
-        }
-
-        wp_enqueue_script($handle, $pluginUrl . '/' . $entry['file'], [], null, true);
+        $assets = new Assets('pressbooks-beacon', AssetType::PLUGIN);
+        $assets->enqueue(
+            'assets/src/scripts/pressbooks-beacon.js',
+            'pressbooks-beacon',
+        );
 
         $userId = get_current_user_id();
-        $currentBlogId = $context === 'webbook' ? get_current_blog_id() : null;
+        $config = self::getConfig($userId);
 
-        $config = self::getConfig($userId, $currentBlogId);
-
-        wp_localize_script($handle, 'PBBorges', $config);
+        wp_localize_script('pressbooks-beacon', 'PBBeacon', $config);
     }
 
-    public static function getConfig(int $userId, ?int $currentBlogId): array
+    public static function getConfig(int $userId): array
     {
-        $settings = get_site_option('pb_borges_settings', []);
+        $settings = get_site_option('pb_beacon_settings', []);
 
         $apiKey = $userId
-            ? KeyGenerator::generateSearchKey($userId, $currentBlogId)
-            : KeyGenerator::generateAnonymousKey(get_current_blog_id());
+            ? KeyGenerator::generateSearchKey($userId)
+            : KeyGenerator::generateSearchKey(0);
 
         return [
             'typesense' => [
-                'nodes' => self::parseNodes($settings['typesense_nodes'] ?? ''),
+                'nodes' => TypesenseClient::parseNodes($settings['typesense_nodes'] ?? ''),
                 'apiKey' => $apiKey,
                 'searchOnly' => true,
             ],
@@ -118,25 +81,11 @@ class SearchBar
                 'books' => 'pb_books',
                 'contributors' => 'pb_contributors',
             ],
-            'context' => $currentBlogId !== null ? 'webbook' : 'admin',
-            'currentBlogId' => $currentBlogId ?? get_current_blog_id(),
-            'resultsPageUrl' => admin_url('admin.php?page=pb_borges_search'),
+            'context' => 'admin',
+            'currentBlogId' => get_current_blog_id(),
+            'blogIds' => $userId ? KeyGenerator::getUserBlogIds($userId) : [],
+            'theme' => $settings['theme'] ?? 'scholarly',
+            'resultsPageUrl' => admin_url('admin.php?page=pb_beacon_search'),
         ];
-    }
-
-    public static function parseNodes(string $nodesStr): array
-    {
-        if (empty($nodesStr)) {
-            return [];
-        }
-
-        return array_map(function (string $node) {
-            $parts = explode(':', $node, 3);
-            return [
-                'host' => $parts[0] ?? 'localhost',
-                'port' => (int) ($parts[1] ?? 443),
-                'protocol' => $parts[2] ?? 'https',
-            ];
-        }, array_filter(array_map('trim', explode(',', $nodesStr))));
     }
 }

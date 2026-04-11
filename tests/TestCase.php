@@ -2,8 +2,8 @@
 
 namespace Tests;
 
-use PressbooksBorges\Bootstrap;
-use PressbooksBorges\Database\Migration;
+use PressbooksBeacon\Bootstrap;
+use PressbooksBeacon\Database\Migration;
 use WP_UnitTestCase;
 
 class TestCase extends WP_UnitTestCase

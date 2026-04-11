@@ -1,8 +1,8 @@
 <?php
 
-namespace PressbooksBorges\Indexing\Indexers;
+namespace PressbooksBeacon\Indexing\Indexers;
 
-use PressbooksBorges\Indexing\IndexerInterface;
+use PressbooksBeacon\Indexing\IndexerInterface;
 
 class BooksIndexer implements IndexerInterface
 {
@@ -16,7 +16,7 @@ class BooksIndexer implements IndexerInterface
         return [];
     }
 
-    public function transformDocument(int $blogId, int $postId = 0): ?array
+    public function transformDocument(int $blogId, int $postId = 0, ?int $termId = null): ?array
     {
         $switched = false;
         if (get_current_blog_id() !== $blogId) {
@@ -34,8 +34,13 @@ class BooksIndexer implements IndexerInterface
         }
 
         $authors = [];
-        if (! empty($bookInfo['pb_author'])) {
-            $authors = array_map('trim', explode(',', $bookInfo['pb_author']));
+        if (! empty($bookInfo['pb_authors'])) {
+            if (is_string($bookInfo['pb_authors'])) {
+                $authors = array_map('trim', explode(',', $bookInfo['pb_authors']));
+            } elseif (is_array($bookInfo['pb_authors'])) {
+                $authors = array_map(fn ($a) => is_array($a) ? ($a['name'] ?? '') : $a, $bookInfo['pb_authors']);
+                $authors = array_filter($authors);
+            }
         }
 
         $subjects = [];
@@ -77,7 +82,7 @@ class BooksIndexer implements IndexerInterface
         return $document;
     }
 
-    public function deleteDocument(int $blogId, int $postId = 0): ?string
+    public function deleteDocument(int $blogId, int $postId = 0, ?int $termId = null): ?string
     {
         return "book_{$blogId}";
     }
