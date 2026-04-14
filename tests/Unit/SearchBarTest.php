@@ -2,8 +2,8 @@
 
 namespace Tests\Unit;
 
-use PressbooksBeacon\Admin\SearchBar;
-use PressbooksBeacon\Search\TypesenseClient;
+use PressbooksMemorious\Admin\SearchBar;
+use PressbooksMemorious\Search\TypesenseClient;
 use Tests\TestCase;
 
 class SearchBarTest extends TestCase
@@ -58,7 +58,7 @@ class SearchBarTest extends TestCase
 
     public function test_get_config_returns_expected_keys(): void
     {
-        update_site_option('pb_beacon_settings', [
+        update_site_option('pb_memorious_settings', [
             'typesense_nodes' => 'localhost:8108:http',
             'typesense_search_key' => 'test-search-key',
             'enabled_admin' => 1,

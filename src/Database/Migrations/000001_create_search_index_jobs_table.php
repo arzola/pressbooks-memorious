@@ -1,15 +1,15 @@
 <?php
 
-use PressbooksBeacon\Interfaces\MigrationInterface;
+use PressbooksMemorious\Interfaces\MigrationInterface;
 
 return new class implements MigrationInterface {
     public function up(): void
     {
-        if (app('db')->schema()->hasTable('pressbooks_beacon_index_jobs')) {
+        if (app('db')->schema()->hasTable('pressbooks_memorious_index_jobs')) {
             return;
         }
 
-        app('db')->schema()->create('pressbooks_beacon_index_jobs', function ($table) {
+        app('db')->schema()->create('pressbooks_memorious_index_jobs', function ($table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('blog_id');
             $table->string('job_type', 30);

@@ -1,9 +1,9 @@
 {
-	"name": "pressbooks/pressbooks-beacon",
+	"name": "pressbooks/pressbooks-memorious",
 	"license": "GPL-3.0-or-later",
 	"type": "wordpress-plugin",
 	"description": "Fast, faceted search for Pressbooks networks powered by Typesense.",
-	"homepage": "https://github.com/pressbooks/pressbooks-beacon",
+	"homepage": "https://github.com/pressbooks/pressbooks-memorious",
 	"authors": [
 		{
 			"name": "Oscar Arzola.",
@@ -19,8 +19,8 @@
 	],
 	"support": {
 		"email": "code@pressbooks.com",
-		"issues": "https://github.com/pressbooks/pressbooks-beacon/issues/",
-		"source": "https://github.com/pressbooks/pressbooks-beacon/"
+		"issues": "https://github.com/pressbooks/pressbooks-memorious/issues/",
+		"source": "https://github.com/pressbooks/pressbooks-memorious/"
 	},
 	"config": {
 		"allow-plugins": {
@@ -30,7 +30,7 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"PressbooksBeacon\\": "src/"
+			"PressbooksMemorious\\": "src/"
 		}
 	},
 	"autoload-dev": {

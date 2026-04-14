@@ -1,6 +1,6 @@
 <?php
 
-namespace PressbooksBeacon\Indexing;
+namespace PressbooksMemorious\Indexing;
 
 interface IndexerInterface
 {

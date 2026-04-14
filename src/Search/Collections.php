@@ -1,6 +1,6 @@
 <?php
 
-namespace PressbooksBeacon\Search;
+namespace PressbooksMemorious\Search;
 
 class Collections
 {
@@ -85,6 +85,6 @@ class Collections
             'pb_contributors' => self::contributors(),
         ];
 
-        return apply_filters('pb_beacon_collections', $core);
+        return apply_filters('pb_memorious_collections', $core);
     }
 }

@@ -1,26 +1,26 @@
-<div id="pb-beacon-search-page">
-    <div class="beacon-page-header">
-        <h1>{{ __('Search', 'pressbooks-beacon') }}</h1>
+<div id="pb-memorious-search-page">
+    <div class="memorious-page-header">
+        <h1>{{ __('Search', 'pressbooks-memorious') }}</h1>
     </div>
 
-    <div id="pb-beacon-filters">
-        <div class="beacon-filter-heading">{{ __('Type', 'pressbooks-beacon') }}</div>
-        <div id="pb-beacon-filter-post-type"></div>
+    <div id="pb-memorious-filters">
+        <div class="memorious-filter-heading">{{ __('Type', 'pressbooks-memorious') }}</div>
+        <div id="pb-memorious-filter-post-type"></div>
 
-        <div class="beacon-filter-heading">{{ __('Book', 'pressbooks-beacon') }}</div>
-        <div id="pb-beacon-filter-book"></div>
+        <div class="memorious-filter-heading">{{ __('Book', 'pressbooks-memorious') }}</div>
+        <div id="pb-memorious-filter-book"></div>
 
-        <div class="beacon-filter-heading">{{ __('Author', 'pressbooks-beacon') }}</div>
-        <div id="pb-beacon-filter-authors"></div>
+        <div class="memorious-filter-heading">{{ __('Author', 'pressbooks-memorious') }}</div>
+        <div id="pb-memorious-filter-authors"></div>
 
-        <div class="beacon-filter-heading">{{ __('License', 'pressbooks-beacon') }}</div>
-        <div id="pb-beacon-filter-license"></div>
+        <div class="memorious-filter-heading">{{ __('License', 'pressbooks-memorious') }}</div>
+        <div id="pb-memorious-filter-license"></div>
     </div>
 
-    <div id="pb-beacon-results">
-        <div id="pb-beacon-searchbox"></div>
-        <div id="pb-beacon-stats"></div>
-        <div id="pb-beacon-hits"></div>
-        <div id="pb-beacon-pagination"></div>
+    <div id="pb-memorious-results">
+        <div id="pb-memorious-searchbox"></div>
+        <div id="pb-memorious-stats"></div>
+        <div id="pb-memorious-hits"></div>
+        <div id="pb-memorious-pagination"></div>
     </div>
 </div>

@@ -1,4 +1,4 @@
-# Pressbooks Beacon
+# Pressbooks Memorious
 
 **Contributors:** arzola
 
@@ -19,9 +19,15 @@ Fast, faceted search for Pressbooks multisite networks powered by [Typesense](ht
 
 ## Description
 
-Pressbooks Beacon adds instant, faceted search across all books in a Pressbooks multisite network. It indexes full chapter text, book metadata, and contributors into Typesense and provides a search UI in the WordPress admin bar.
+Pressbooks Memorious adds instant, faceted search across all books in a Pressbooks multisite network. It indexes full chapter text, book metadata, and contributors into Typesense and provides a search UI in the WordPress admin bar.
 
-### Why Beacon?
+### Why Memorious?
+
+> "He was, let us not forget, almost incapable of general, platonic ideas… His own face, in the mirror, struck him as being a gallery of portraits… Every detail was there, intact."
+>
+> — Jorge Luis Borges, *"Funes the Memorious"* (1942)
+
+Named after Ireneo Funes, the protagonist of Borges' short story who, after a riding accident, gained the ability to remember every moment of his life in perfect, infinite detail — a memory without abstraction or forgetting.
 
 - **Typo-tolerant** — Built on Typesense's typo-tolerance engine. Misspell a word and still get relevant results. "ecology" matches "ecologi", "ecolgy", even "ecologii".
 - **Combined search** — Search by any combination of terms: a topic + an author name, a book title + a license type, a keyword + a contributor. Results are ranked by relevance across all your books at once.
@@ -73,7 +79,7 @@ Pressbooks Beacon adds instant, faceted search across all books in a Pressbooks 
 1. Install Typesense — see [typesense.org/docs/guide](https://typesense.org/docs/guide/) for self-hosted or cloud options
 2. Install the plugin:
    ```bash
-   composer require pressbooks/pressbooks-beacon
+   composer require pressbooks/pressbooks-memorious
    ```
 3. Network-activate the plugin
 4. Generate a search-only API key from your admin key:
@@ -81,11 +87,11 @@ Pressbooks Beacon adds instant, faceted search across all books in a Pressbooks 
    curl -H "X-TYPESENSE-API-KEY: YOUR_ADMIN_KEY" \
      -X POST \
      -H "Content-Type: application/json" \
-     -d '{"description": "Beacon search-only key", "actions": ["documents:search"], "collections": ["*"]}' \
+     -d '{"description": "Memorious search-only key", "actions": ["documents:search"], "collections": ["*"]}' \
      http://localhost:8108/keys
    ```
    Copy the `value` from the response — this is your **Search API Key**.
-5. Go to **Network Admin → Settings → Beacon Search**
+5. Go to **Network Admin → Settings → Memorious Search**
 6. Enter your Typesense connection details:
    - **Nodes** — comma-separated `host:port:protocol` (e.g. `typesense.example.com:443:https`)
    - **Admin API Key** — a key with full admin access (used for indexing, creating collections)
@@ -123,22 +129,22 @@ Pressbooks Beacon adds instant, faceted search across all books in a Pressbooks 
 5. Clone and set up the plugin:
    ```bash
    cd web/app/plugins
-   git clone https://github.com/pressbooks/pressbooks-beacon.git
-   cd pressbooks-beacon
+   git clone https://github.com/pressbooks/pressbooks-memorious.git
+   cd pressbooks-memorious
    npm install
    composer install
    npm run build
    lando composer dump-autoload
    ```
 
-6. Network-activate the plugin, then go to **Network Admin → Settings → Beacon Search** and configure:
+6. Network-activate the plugin, then go to **Network Admin → Settings → Memorious Search** and configure:
    - **Nodes**: `localhost:8108:http`
     - **Admin API Key**: `pb-dev-admin-key`
     - **Search API Key**: generate one using the admin key:
       ```bash
       curl -s -H "X-TYPESENSE-API-KEY: pb-dev-admin-key" \
         -X POST -H "Content-Type: application/json" \
-        -d '{"description":"Beacon dev search key","actions":["documents:search"],"collections":["*"]}' \
+        -d '{"description":"Memorious dev search key","actions":["documents:search"],"collections":["*"]}' \
         http://localhost:8108/keys | jq -r '.value'
       ```
 
@@ -150,7 +156,7 @@ Pressbooks Beacon adds instant, faceted search across all books in a Pressbooks 
 
 ## Configuration
 
-All settings are at **Network Admin → Settings → Beacon Search**.
+All settings are at **Network Admin → Settings → Memorious Search**.
 
 | Setting | Description | Default |
 |---|---|---|
@@ -176,22 +182,22 @@ All settings are at **Network Admin → Settings → Beacon Search**.
 
 ```bash
 # Reindex a single book
-wp beacon reindex <blog_id>
+wp memorious reindex <blog_id>
 
 # Reindex all books
-wp beacon reindex
+wp memorious reindex
 
 # Process queued indexing jobs (run via cron or manually)
-wp beacon process-jobs [<limit>]
+wp memorious process-jobs [<limit>]
 
 # Drop and recreate all Typesense collections
-wp beacon reset-collections
+wp memorious reset-collections
 
 # Reset collections + clear jobs + queue full reindex
-wp beacon reindex-reset
+wp memorious reindex-reset
 
 # Check job queue status
-wp beacon job-status
+wp memorious job-status
 ```
 
 ### Cron setup for job processing
@@ -199,7 +205,7 @@ wp beacon job-status
 Indexing jobs are processed by WP-Cron. For production, set up a system cron:
 
 ```bash
-* * * * * cd /var/www/html && wp beacon process-jobs 50 --quiet
+* * * * * cd /var/www/html && wp memorious process-jobs 50 --quiet
 ```
 
 Or use WP-Cron with a 1-minute interval by ensuring `DISABLE_WP_CRON` is not set.
@@ -245,7 +251,7 @@ pb_contributors
 
 ### Security: Scoped API Keys
 
-Beacon never exposes the admin API key to the browser. Instead, it derives **scoped API keys** using HMAC:
+Memorious never exposes the admin API key to the browser. Instead, it derives **scoped API keys** using HMAC:
 
 1. The **search API key** (stored in settings) is the parent key
 2. On each page load, a scoped key is generated with embedded `filter_by` rules:
@@ -271,7 +277,7 @@ Content is re-indexed automatically via WordPress hooks:
 
 ```php
 // Add custom fields to a collection
-add_filter('pb_beacon_collections', function (array $collections) {
+add_filter('pb_memorious_collections', function (array $collections) {
     $collections['pb_sections']['fields'][] = [
         'name' => 'custom_field',
         'type' => 'string',
@@ -284,8 +290,8 @@ add_filter('pb_beacon_collections', function (array $collections) {
 ## File Structure
 
 ```
-pressbooks-beacon/
-├── pressbooks-beacon.php          # Plugin entry point
+pressbooks-memorious/
+├── pressbooks-memorious.php          # Plugin entry point
 ├── composer.json
 ├── package.json
 ├── vite.config.js
@@ -298,7 +304,7 @@ pressbooks-beacon/
 │   ├── Api/
 │   │   └── SearchEndpoint.php    # REST API endpoint
 │   ├── Cli/
-│   │   └── BeaconCommand.php     # WP-CLI commands
+│   │   └── MemoriousCommand.php     # WP-CLI commands
 │   ├── Database/
 │   │   ├── Migration.php         # Auto-discovers and runs migrations
 │   │   └── Migrations/
@@ -318,12 +324,12 @@ pressbooks-beacon/
 │   └── Interfaces/
 │       └── MigrationInterface.php
 ├── assets/
-│   ├── beacon.png                # Plugin icon
+│   ├── memorious.png                # Plugin icon
 │   ├── src/
 │   │   ├── scripts/
-│   │   │   └── pressbooks-beacon.js   # Search UI (Instantsearch.js + Typesense)
+│   │   │   └── pressbooks-memorious.js   # Search UI (Instantsearch.js + Typesense)
 │   │   └── styles/
-│   │       └── pressbooks-beacon.css  # Themed styles
+│   │       └── pressbooks-memorious.css  # Themed styles
 │   └── dist/                          # Vite build output
 ├── resources/
 │   └── views/

@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use PressbooksBeacon\Search\Collections;
+use PressbooksMemorious\Search\Collections;
 use Tests\TestCase;
 
 class CollectionsTest extends TestCase
@@ -67,7 +67,7 @@ class CollectionsTest extends TestCase
 
     public function test_all_can_be_filtered(): void
     {
-        add_filter('pb_beacon_collections', function (array $collections) {
+        add_filter('pb_memorious_collections', function (array $collections) {
             $collections['pb_custom'] = [
                 'name' => 'pb_custom',
                 'fields' => [['name' => 'id', 'type' => 'string']],

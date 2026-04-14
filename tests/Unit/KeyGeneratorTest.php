@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use PressbooksBeacon\Search\KeyGenerator;
+use PressbooksMemorious\Search\KeyGenerator;
 use Tests\TestCase;
 
 class KeyGeneratorTest extends TestCase

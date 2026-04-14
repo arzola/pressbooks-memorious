@@ -1,11 +1,11 @@
 <?php
 
-namespace PressbooksBeacon\Search;
+namespace PressbooksMemorious\Search;
 
-use PressbooksBeacon\Indexing\IndexJobProcessor;
-use PressbooksBeacon\Indexing\Indexers\BooksIndexer;
-use PressbooksBeacon\Indexing\Indexers\ContributorsIndexer;
-use PressbooksBeacon\Indexing\Indexers\SectionsIndexer;
+use PressbooksMemorious\Indexing\IndexJobProcessor;
+use PressbooksMemorious\Indexing\Indexers\BooksIndexer;
+use PressbooksMemorious\Indexing\Indexers\ContributorsIndexer;
+use PressbooksMemorious\Indexing\Indexers\SectionsIndexer;
 
 class SearchService
 {
@@ -23,7 +23,7 @@ class SearchService
 
     public function getIndexers(): array
     {
-        return apply_filters('pb_beacon_indexers', [
+        return apply_filters('pb_memorious_indexers', [
             new SectionsIndexer,
             new BooksIndexer,
             new ContributorsIndexer,

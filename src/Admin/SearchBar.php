@@ -1,9 +1,9 @@
 <?php
 
-namespace PressbooksBeacon\Admin;
+namespace PressbooksMemorious\Admin;
 
-use PressbooksBeacon\Search\KeyGenerator;
-use PressbooksBeacon\Search\TypesenseClient;
+use PressbooksMemorious\Search\KeyGenerator;
+use PressbooksMemorious\Search\TypesenseClient;
 use PressbooksFrontendTools\Assets;
 use PressbooksFrontendTools\AssetType;
 
@@ -21,16 +21,16 @@ class SearchBar
 
     public static function addSearchBar(\WP_Admin_Bar $wpAdminBar): void
     {
-        $settings = get_site_option('pb_beacon_settings', []);
+        $settings = get_site_option('pb_memorious_settings', []);
 
         if (empty($settings['typesense_nodes']) || empty($settings['enabled_admin'])) {
             return;
         }
 
         $wpAdminBar->add_node([
-            'id' => 'pb-beacon-search',
+            'id' => 'pb-memorious-search',
             'parent' => 'top-secondary',
-            'title' => '<span class="pb-beacon-icon-btn" role="button" tabindex="0" aria-label="' . esc_attr__('Search', 'pressbooks-beacon') . '" aria-expanded="false" aria-controls="pb-beacon-search-bar"><i class="pb-heroicons pb-heroicons-outline_magnifying-glass"></i></span>',
+            'title' => '<span class="pb-memorious-icon-btn" role="button" tabindex="0" aria-label="' . esc_attr__('Search', 'pressbooks-memorious') . '" aria-expanded="false" aria-controls="pb-memorious-search-bar"><i class="pb-heroicons pb-heroicons-outline_magnifying-glass"></i></span>',
             'href' => false,
             'meta' => [
                 'tabindex' => 0,
@@ -40,7 +40,7 @@ class SearchBar
 
     public static function enqueueAdminAssets(): void
     {
-        $settings = get_site_option('pb_beacon_settings', []);
+        $settings = get_site_option('pb_memorious_settings', []);
         if (empty($settings['typesense_nodes']) || empty($settings['enabled_admin'])) {
             return;
         }
@@ -50,21 +50,21 @@ class SearchBar
 
     private static function doEnqueue(): void
     {
-        $assets = new Assets('pressbooks-beacon', AssetType::PLUGIN);
+        $assets = new Assets('pressbooks-memorious', AssetType::PLUGIN);
         $assets->enqueue(
-            'assets/src/scripts/pressbooks-beacon.js',
-            'pressbooks-beacon',
+            'assets/src/scripts/pressbooks-memorious.js',
+            'pressbooks-memorious',
         );
 
         $userId = get_current_user_id();
         $config = self::getConfig($userId);
 
-        wp_localize_script('pressbooks-beacon', 'PBBeacon', $config);
+        wp_localize_script('pressbooks-memorious', 'PBMemorious', $config);
     }
 
     public static function getConfig(int $userId): array
     {
-        $settings = get_site_option('pb_beacon_settings', []);
+        $settings = get_site_option('pb_memorious_settings', []);
 
         $apiKey = $userId
             ? KeyGenerator::generateSearchKey($userId)
@@ -85,7 +85,7 @@ class SearchBar
             'currentBlogId' => get_current_blog_id(),
             'blogIds' => $userId ? KeyGenerator::getUserBlogIds($userId) : [],
             'theme' => $settings['theme'] ?? 'scholarly',
-            'resultsPageUrl' => admin_url('admin.php?page=pb_beacon_search'),
+            'resultsPageUrl' => admin_url('admin.php?page=pb_memorious_search'),
         ];
     }
 }

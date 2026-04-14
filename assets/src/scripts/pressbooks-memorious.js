@@ -1,23 +1,23 @@
-/* global PBBeacon */
+/* global PBMemorious */
 
-import '../styles/pressbooks-beacon.css';
+import '../styles/pressbooks-memorious.css';
 import instantsearch from 'instantsearch.js';
 import { searchBox, hits, pagination, refinementList, stats } from 'instantsearch.js/es/widgets';
 import TypesenseInstantSearchAdapter from 'typesense-instantsearch-adapter';
 
 document.addEventListener( 'DOMContentLoaded', () => {
-	if ( typeof PBBeacon === 'undefined' || ! PBBeacon.typesense.nodes.length ) {
+	if ( typeof PBMemorious === 'undefined' || ! PBMemorious.typesense.nodes.length ) {
 		return;
 	}
 
-	const node = PBBeacon.typesense.nodes[ 0 ];
+	const node = PBMemorious.typesense.nodes[ 0 ];
 	const typesenseBaseUrl = node.protocol + '://' + node.host + ':' + node.port;
-	const typesenseApiKey = PBBeacon.typesense.apiKey;
+	const typesenseApiKey = PBMemorious.typesense.apiKey;
 
 	const typesenseInstantsearchAdapter = new TypesenseInstantSearchAdapter( {
 		server: {
-			nodes: PBBeacon.typesense.nodes,
-			apiKey: PBBeacon.typesense.apiKey,
+			nodes: PBMemorious.typesense.nodes,
+			apiKey: PBMemorious.typesense.apiKey,
 		},
 		additionalSearchParameters: {
 			query_by: 'title,content',
@@ -31,10 +31,10 @@ document.addEventListener( 'DOMContentLoaded', () => {
 
 	const searchClient = typesenseInstantsearchAdapter.searchClient;
 
-	const theme = PBBeacon.theme ?? 'scholarly';
+	const theme = PBMemorious.theme ?? 'scholarly';
 
-	const iconBtn = document.querySelector( '.pb-beacon-icon-btn' );
-	const adminBarItem = document.querySelector( '#wp-admin-bar-pb-beacon-search .ab-item' );
+	const iconBtn = document.querySelector( '.pb-memorious-icon-btn' );
+	const adminBarItem = document.querySelector( '#wp-admin-bar-pb-memorious-search .ab-item' );
 
 	let searchBar, searchInput, dropdown;
 
@@ -76,13 +76,13 @@ document.addEventListener( 'DOMContentLoaded', () => {
 
 		if ( wpbody && wpbodyContent ) {
 			searchBar = document.createElement( 'div' );
-			searchBar.id = 'pb-beacon-search-bar';
+			searchBar.id = 'pb-memorious-search-bar';
 			searchBar.setAttribute( 'data-theme', theme );
-			searchBar.innerHTML = '<div class="pb-beacon-search-inner"><input type="text" id="pb-beacon-search-input" placeholder="What are you looking for?" /><p class="pb-beacon-hint">Search across all your books \u2014 chapters, front matter, back matter, glossary terms, book titles, authors, and contributors.</p></div><div id="pb-beacon-dropdown"></div>';
+			searchBar.innerHTML = '<div class="pb-memorious-search-inner"><input type="text" id="pb-memorious-search-input" placeholder="What are you looking for?" /><p class="pb-memorious-hint">Search across all your books \u2014 chapters, front matter, back matter, glossary terms, book titles, authors, and contributors.</p></div><div id="pb-memorious-dropdown"></div>';
 			wpbody.insertBefore( searchBar, wpbodyContent );
 
-			searchInput = searchBar.querySelector( '#pb-beacon-search-input' );
-			dropdown = searchBar.querySelector( '#pb-beacon-dropdown' );
+			searchInput = searchBar.querySelector( '#pb-memorious-search-input' );
+			dropdown = searchBar.querySelector( '#pb-memorious-dropdown' );
 		}
 
 		const clickTarget = adminBarItem ?? iconBtn;
@@ -115,7 +115,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 
 			debounceTimer = setTimeout( async () => {
 				try {
-					const blogIds = PBBeacon.blogIds ?? [];
+					const blogIds = PBMemorious.blogIds ?? [];
 					const searches = [
 						{
 							collection: 'pb_contributors',
@@ -159,7 +159,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 					const data = await resp.json();
 					renderDropdown( data.results );
 				} catch ( err ) {
-					console.error( 'Beacon search error:', err );
+					console.error( 'Memorious search error:', err );
 				}
 			}, 300 );
 		} );
@@ -201,16 +201,16 @@ document.addEventListener( 'DOMContentLoaded', () => {
 		const sections = results[2]?.hits ?? [];
 
 		if ( contributors.length ) {
-			html += '<div class="pb-beacon-group"><div class="pb-beacon-group-label">Contributors</div>';
+			html += '<div class="pb-memorious-group"><div class="pb-memorious-group-label">Contributors</div>';
 			contributors.forEach( hit => {
 				const nameHl = hit.highlights?.find( h => h.field === 'name' );
 				const name = nameHl?.snippet ?? hit.document.name;
 				const types = ( hit.document.contributor_type ?? [] ).join( ', ' );
-				html += `<div class="pb-beacon-hit pb-beacon-hit--contributor">
-					<span class="pb-beacon-hit-type">Person</span>
-					<div class="pb-beacon-hit-body">
-						<div class="pb-beacon-hit-title">${ name }</div>
-						<div class="pb-beacon-hit-meta">${ types ? types + ' \u00b7 ' : '' }${ hit.document.book_count ?? 0 } books</div>
+				html += `<div class="pb-memorious-hit pb-memorious-hit--contributor">
+					<span class="pb-memorious-hit-type">Person</span>
+					<div class="pb-memorious-hit-body">
+						<div class="pb-memorious-hit-title">${ name }</div>
+						<div class="pb-memorious-hit-meta">${ types ? types + ' \u00b7 ' : '' }${ hit.document.book_count ?? 0 } books</div>
 					</div>
 				</div>`;
 			} );
@@ -218,17 +218,17 @@ document.addEventListener( 'DOMContentLoaded', () => {
 		}
 
 		if ( books.length ) {
-			html += '<div class="pb-beacon-group"><div class="pb-beacon-group-label">Books</div>';
+			html += '<div class="pb-memorious-group"><div class="pb-memorious-group-label">Books</div>';
 			books.forEach( hit => {
 				const titleHl = hit.highlights?.find( h => h.field === 'title' );
 				const title = titleHl?.snippet ?? hit.document.title;
 				const link = hit.document.book_url ?? '#';
 				const authors = ( hit.document.authors ?? [] ).join( ', ' );
-				html += `<a href="${ link }" class="pb-beacon-hit pb-beacon-hit--book">
-					<span class="pb-beacon-hit-type">Book</span>
-					<div class="pb-beacon-hit-body">
-						<div class="pb-beacon-hit-title">${ title }</div>
-						<div class="pb-beacon-hit-meta">${ authors }</div>
+				html += `<a href="${ link }" class="pb-memorious-hit pb-memorious-hit--book">
+					<span class="pb-memorious-hit-type">Book</span>
+					<div class="pb-memorious-hit-body">
+						<div class="pb-memorious-hit-title">${ title }</div>
+						<div class="pb-memorious-hit-meta">${ authors }</div>
 					</div>
 				</a>`;
 			} );
@@ -236,7 +236,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 		}
 
 		if ( sections.length ) {
-			html += '<div class="pb-beacon-group"><div class="pb-beacon-group-label">Sections</div>';
+			html += '<div class="pb-memorious-group"><div class="pb-memorious-group-label">Sections</div>';
 			sections.forEach( hit => {
 				const titleHl = hit.highlights?.find( h => h.field === 'title' );
 				const title = titleHl?.snippet ?? hit.document.title;
@@ -244,12 +244,12 @@ document.addEventListener( 'DOMContentLoaded', () => {
 				const snippet = contentHl?.snippet ?? '';
 				const link = hit.document.edit_url ?? '#';
 				const typeLabel = formatPostType( hit.document.post_type );
-				html += `<a href="${ link }" class="pb-beacon-hit pb-beacon-hit--section">
-					<span class="pb-beacon-hit-type">${ typeLabel }</span>
-					<div class="pb-beacon-hit-body">
-						<div class="pb-beacon-hit-title">${ title }</div>
-						<div class="pb-beacon-hit-meta">${ hit.document.book_title ?? '' }</div>
-						${ snippet ? `<div class="pb-beacon-hit-snippet">${ snippet }</div>` : '' }
+				html += `<a href="${ link }" class="pb-memorious-hit pb-memorious-hit--section">
+					<span class="pb-memorious-hit-type">${ typeLabel }</span>
+					<div class="pb-memorious-hit-body">
+						<div class="pb-memorious-hit-title">${ title }</div>
+						<div class="pb-memorious-hit-meta">${ hit.document.book_title ?? '' }</div>
+						${ snippet ? `<div class="pb-memorious-hit-snippet">${ snippet }</div>` : '' }
 					</div>
 				</a>`;
 			} );
@@ -259,10 +259,10 @@ document.addEventListener( 'DOMContentLoaded', () => {
 		const totalFound = ( results[0]?.found ?? 0 ) + ( results[1]?.found ?? 0 ) + ( results[2]?.found ?? 0 );
 
 		if ( totalFound === 0 ) {
-			html = '<div class="pb-beacon-empty">No matches in the library.</div>';
+			html = '<div class="pb-memorious-empty">No matches in the library.</div>';
 		} else {
-			html += `<div class="pb-beacon-see-all">
-				<a href="${ PBBeacon.resultsPageUrl }&q=${ encodeURIComponent( searchInput.value ) }">View all ${ totalFound } results \u2192</a>
+			html += `<div class="pb-memorious-see-all">
+				<a href="${ PBMemorious.resultsPageUrl }&q=${ encodeURIComponent( searchInput.value ) }">View all ${ totalFound } results \u2192</a>
 			</div>`;
 		}
 
@@ -309,19 +309,19 @@ document.addEventListener( 'DOMContentLoaded', () => {
 		return truncated + '\u2026';
 	}
 
-	const searchPage = document.getElementById( 'pb-beacon-search-page' );
+	const searchPage = document.getElementById( 'pb-memorious-search-page' );
 	if ( searchPage ) {
 		searchPage.setAttribute( 'data-theme', theme );
 
-		const hitsContainer = document.getElementById( 'pb-beacon-hits' );
+		const hitsContainer = document.getElementById( 'pb-memorious-hits' );
 		if ( hitsContainer ) {
-			let skeletonHtml = '<div class="pb-beacon-skeleton">';
+			let skeletonHtml = '<div class="pb-memorious-skeleton">';
 			for ( let i = 0; i < 5; i++ ) {
-				skeletonHtml += `<div class="pb-beacon-skeleton-item">
-					<div class="pb-beacon-skeleton-line" style="width:${ 60 + Math.round( Math.random() * 30 ) }%"></div>
-					<div class="pb-beacon-skeleton-line pb-beacon-skeleton-meta"></div>
-					<div class="pb-beacon-skeleton-line pb-beacon-skeleton-text" style="width:${ 80 + Math.round( Math.random() * 15 ) }%"></div>
-					<div class="pb-beacon-skeleton-line pb-beacon-skeleton-text" style="width:${ 50 + Math.round( Math.random() * 30 ) }%"></div>
+				skeletonHtml += `<div class="pb-memorious-skeleton-item">
+					<div class="pb-memorious-skeleton-line" style="width:${ 60 + Math.round( Math.random() * 30 ) }%"></div>
+					<div class="pb-memorious-skeleton-line pb-memorious-skeleton-meta"></div>
+					<div class="pb-memorious-skeleton-line pb-memorious-skeleton-text" style="width:${ 80 + Math.round( Math.random() * 15 ) }%"></div>
+					<div class="pb-memorious-skeleton-line pb-memorious-skeleton-text" style="width:${ 50 + Math.round( Math.random() * 30 ) }%"></div>
 				</div>`;
 			}
 			skeletonHtml += '</div>';
@@ -338,7 +338,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 
 		search.addWidgets( [
 			searchBox( {
-				container: '#pb-beacon-searchbox',
+				container: '#pb-memorious-searchbox',
 				/**
 				 *
 				 * @param query
@@ -348,27 +348,27 @@ document.addEventListener( 'DOMContentLoaded', () => {
 					search( query );
 				},
 			} ),
-			stats( { container: '#pb-beacon-stats' } ),
+			stats( { container: '#pb-memorious-stats' } ),
 			refinementList( {
-				container: '#pb-beacon-filter-post-type',
+				container: '#pb-memorious-filter-post-type',
 				attribute: 'post_type',
 			} ),
 			refinementList( {
-				container: '#pb-beacon-filter-book',
+				container: '#pb-memorious-filter-book',
 				attribute: 'book_title',
 				searchable: true,
 			} ),
 			refinementList( {
-				container: '#pb-beacon-filter-authors',
+				container: '#pb-memorious-filter-authors',
 				attribute: 'authors',
 				searchable: true,
 			} ),
 			refinementList( {
-				container: '#pb-beacon-filter-license',
+				container: '#pb-memorious-filter-license',
 				attribute: 'section_license',
 			} ),
 			hits( {
-				container: '#pb-beacon-hits',
+				container: '#pb-memorious-hits',
 				templates: {
 					/**
 					 *
@@ -379,21 +379,21 @@ document.addEventListener( 'DOMContentLoaded', () => {
 						const snippet = raw ? truncateSnippet( raw, 180 ) : '';
 						const link = hit.edit_url ?? '#';
 						const typeLabel = formatPostType( hit.post_type );
-						return `<div class="pb-beacon-result">
+						return `<div class="pb-memorious-result">
 							<h3><a href="${ link }">${ hit._highlightResult?.title?.value ?? hit.title }</a></h3>
-							<div class="pb-beacon-result-meta">${ typeLabel } \u00b7 ${ hit.book_title ?? '' }</div>
-							${ snippet ? `<p class="pb-beacon-result-snippet">${ snippet }</p>` : '' }
+							<div class="pb-memorious-result-meta">${ typeLabel } \u00b7 ${ hit.book_title ?? '' }</div>
+							${ snippet ? `<p class="pb-memorious-result-snippet">${ snippet }</p>` : '' }
 						</div>`;
 					},
 				},
 			} ),
-			pagination( { container: '#pb-beacon-pagination' } ),
+			pagination( { container: '#pb-memorious-pagination' } ),
 		] );
 
 		search.start();
 
 		if ( initialQuery ) {
-			const input = document.querySelector( '#pb-beacon-searchbox input' );
+			const input = document.querySelector( '#pb-memorious-searchbox input' );
 			if ( input ) {
 				input.value = initialQuery;
 				input.dispatchEvent( new Event( 'input' ) );

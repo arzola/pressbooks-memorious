@@ -1,8 +1,8 @@
-# AGENTS.md - Pressbooks Beacon
+# AGENTS.md - Pressbooks Memorious
 
 ## Project Overview
 
-Pressbooks Beacon is a standalone WordPress plugin that adds fast, faceted search to Pressbooks multisite networks. It indexes full chapter text, book metadata, and contributors into Typesense and provides an admin bar search UI. Requires **PHP 8.3+** and **WordPress 6.8+ Multisite** with Pressbooks active.
+Pressbooks Memorious is a standalone WordPress plugin that adds fast, faceted search to Pressbooks multisite networks. It indexes full chapter text, book metadata, and contributors into Typesense and provides an admin bar search UI. Requires **PHP 8.3+** and **WordPress 6.8+ Multisite** with Pressbooks active.
 
 ## Build & Test Commands
 
@@ -41,12 +41,12 @@ Node >= 22 (see `.nvmrc`). Sources in `assets/src/`, output in `assets/dist/`. D
 
 ## Autoloading
 
-PSR-4 via Composer: `PressbooksBeacon\` maps to `src/`.
+PSR-4 via Composer: `PressbooksMemorious\` maps to `src/`.
 
 ```
-PressbooksBeacon\Search\TypesenseClient  -> src/Search/TypesenseClient.php
-PressbooksBeacon\Admin\SearchAdmin       -> src/Admin/SearchAdmin.php
-PressbooksBeacon\Cli\BeaconCommand      -> src/Cli/BeaconCommand.php
+PressbooksMemorious\Search\TypesenseClient  -> src/Search/TypesenseClient.php
+PressbooksMemorious\Admin\SearchAdmin       -> src/Admin/SearchAdmin.php
+PressbooksMemorious\Cli\MemoriousCommand      -> src/Cli/MemoriousCommand.php
 ```
 
 ## Code Style
@@ -72,7 +72,7 @@ if ( ! empty( $settings['typesense_nodes'] ) ) {
 | Classes | PascalCase | `TypesenseClient`, `IndexJobProcessor` |
 | Test files | `*Test.php` | `CollectionsTest.php`, `KeyGeneratorTest.php` |
 | Test methods | `test_descriptiveName` | `test_parse_nodes_single_node()` |
-| CLI commands | kebab-case | `wp beacon reindex`, `wp beacon process-jobs` |
+| CLI commands | kebab-case | `wp memorious reindex`, `wp memorious process-jobs` |
 
 ### Type Hints
 
@@ -97,9 +97,9 @@ The `SearchService` is the central coordinator. It wraps `TypesenseClient` and m
 
 - `Bootstrap` — registers all hooks, menus, scripts, CLI commands
 - `SearchService` — coordinates between client, indexers, and queue
-- `IndexJobProcessor` — owns `processJob()` (the single implementation; `BeaconCommand` delegates to it)
+- `IndexJobProcessor` — owns `processJob()` (the single implementation; `MemoriousCommand` delegates to it)
 - `TypesenseClient` — wraps the Typesense PHP SDK; owns `parseNodes()` and `fromSettings()`
-- `BeaconCommand::doResetCollections()` — single implementation for collection reset (used by CLI and AJAX)
+- `MemoriousCommand::doResetCollections()` — single implementation for collection reset (used by CLI and AJAX)
 
 ### Admin Pages
 
@@ -107,7 +107,7 @@ Network admin settings page registered via `add_submenu_page` on `network_admin_
 
 ### Asset Pipeline
 
-Uses `PressbooksFrontendTools\Assets` + Vite via pressbooks-build-tools. Single entry point `assets/src/scripts/pressbooks-beacon.js` imports CSS — Vite auto-extracts it. Config is passed to JS via `wp_localize_script('pressbooks-beacon', 'PBBeacon', $config)`.
+Uses `PressbooksFrontendTools\Assets` + Vite via pressbooks-build-tools. Single entry point `assets/src/scripts/pressbooks-memorious.js` imports CSS — Vite auto-extracts it. Config is passed to JS via `wp_localize_script('pressbooks-memorious', 'PBMemorious', $config)`.
 
 ### Security: Scoped API Keys
 
@@ -116,9 +116,9 @@ Uses `PressbooksFrontendTools\Assets` + Vite via pressbooks-build-tools. Single 
 ## Important Rules
 
 - **No webbook/frontend search** — admin-only for now
-- **Single `processJob` implementation** — lives in `IndexJobProcessor`, not duplicated in `BeaconCommand`
+- **Single `processJob` implementation** — lives in `IndexJobProcessor`, not duplicated in `MemoriousCommand`
 - **Node parsing** — use `TypesenseClient::parseNodes()`, not a local implementation
-- **Collections reset** — use `BeaconCommand::doResetCollections()`, not inline
+- **Collections reset** — use `MemoriousCommand::doResetCollections()`, not inline
 - **Context is always `'admin'`** — no webbook context in `getConfig()` or JS
 
 ## Git Conventions
@@ -132,18 +132,18 @@ Uses `PressbooksFrontendTools\Assets` + Vite via pressbooks-build-tools. Single 
 ## WP-CLI Commands
 
 ```bash
-wp beacon reindex [<blog_id>]           # Queue reindex for one or all books
-wp beacon process-jobs [<limit>]        # Process pending indexing jobs (default 50)
-wp beacon create-collections            # Create Typesense collections (no delete)
-wp beacon reset-collections             # Delete and recreate collections
-wp beacon reindex-reset [<blog_id>]     # Reset collections + clear queue + full reindex
-wp beacon job-status                    # Show pending/processing/completed/failed counts
+wp memorious reindex [<blog_id>]           # Queue reindex for one or all books
+wp memorious process-jobs [<limit>]        # Process pending indexing jobs (default 50)
+wp memorious create-collections            # Create Typesense collections (no delete)
+wp memorious reset-collections             # Delete and recreate collections
+wp memorious reindex-reset [<blog_id>]     # Reset collections + clear queue + full reindex
+wp memorious job-status                    # Show pending/processing/completed/failed counts
 ```
 
 ## File Structure
 
 ```
-pressbooks-beacon.php                    # Plugin entry point
+pressbooks-memorious.php                    # Plugin entry point
 src/
 ├── Bootstrap.php                        # Service registration, hooks
 ├── Admin/
@@ -151,9 +151,9 @@ src/
 │   ├── SearchBar.php                    # Admin bar node, asset enqueueing
 │   └── SearchHealthCheck.php            # Typesense health check (not wired)
 ├── Api/
-│   └── SearchEndpoint.php              # REST API /pressbooks-beacon/v1/search
+│   └── SearchEndpoint.php              # REST API /pressbooks-memorious/v1/search
 ├── Cli/
-│   └── BeaconCommand.php               # WP-CLI commands
+│   └── MemoriousCommand.php               # WP-CLI commands
 ├── Database/
 │   ├── Migration.php
 │   └── Migrations/000001_*.php
@@ -172,10 +172,10 @@ src/
 └── Interfaces/
     └── MigrationInterface.php
 assets/
-├── beacon.png
+├── memorious.png
 ├── src/                                 # Edit here
-│   ├── scripts/pressbooks-beacon.js
-│   └── styles/pressbooks-beacon.css
+│   ├── scripts/pressbooks-memorious.js
+│   └── styles/pressbooks-memorious.css
 └── dist/                                # Vite output (do not edit)
 resources/views/
 ├── admin/settings.blade.php

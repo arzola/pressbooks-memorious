@@ -1,16 +1,16 @@
 <?php
 
-namespace PressbooksBeacon\Search;
+namespace PressbooksMemorious\Search;
 
 class KeyGenerator
 {
     public static function generateSearchKey(int $userId, ?int $currentBlogId = null): string
     {
-        $settings = get_site_option('pb_beacon_settings', []);
+        $settings = get_site_option('pb_memorious_settings', []);
         $parentKey = $settings['typesense_search_key'] ?? '';
 
         $blogIds = self::getUserBlogIds($userId);
-        $cacheKey = "pb_beacon_key_{$userId}_" . md5(json_encode($blogIds));
+        $cacheKey = "pb_memorious_key_{$userId}_" . md5(json_encode($blogIds));
         $cached = get_transient($cacheKey);
         if ($cached !== false) {
             return $cached;

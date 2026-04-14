@@ -1,5 +1,5 @@
 {
-  "name": "pressbooks-beacon",
+  "name": "pressbooks-memorious",
   "description": "Fast, faceted search for Pressbooks networks powered by Typesense.",
   "type": "module",
   "scripts": {
@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/pressbooks/pressbooks-beacon.git"
+    "url": "git+ssh://git@github.com/pressbooks/pressbooks-memorious.git"
   },
   "keywords": [
     "wordpress-plugin",
@@ -24,9 +24,9 @@
   "author": "Pressbooks (Book Oven Inc.)",
   "license": "GPL-3.0-or-later",
   "bugs": {
-    "url": "https://github.com/pressbooks/pressbooks-beacon/issues"
+    "url": "https://github.com/pressbooks/pressbooks-memorious/issues"
   },
-  "homepage": "https://github.com/pressbooks/pressbooks-beacon#readme",
+  "homepage": "https://github.com/pressbooks/pressbooks-memorious#readme",
   "dependencies": {
     "typesense-instantsearch-adapter": "^2.0",
     "instantsearch.js": "^4.0"

@@ -1,8 +1,8 @@
 <?php
 
-namespace PressbooksBeacon\Indexing\Indexers;
+namespace PressbooksMemorious\Indexing\Indexers;
 
-use PressbooksBeacon\Indexing\IndexerInterface;
+use PressbooksMemorious\Indexing\IndexerInterface;
 
 class BooksIndexer implements IndexerInterface
 {

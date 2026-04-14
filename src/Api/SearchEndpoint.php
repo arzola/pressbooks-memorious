@@ -1,8 +1,8 @@
 <?php
 
-namespace PressbooksBeacon\Api;
+namespace PressbooksMemorious\Api;
 
-use PressbooksBeacon\Search\TypesenseClient;
+use PressbooksMemorious\Search\TypesenseClient;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
@@ -16,7 +16,7 @@ class SearchEndpoint
 
     public static function registerRoutes(): void
     {
-        register_rest_route('pressbooks-beacon/v1', '/search', [
+        register_rest_route('pressbooks-memorious/v1', '/search', [
             [
                 'methods' => WP_REST_Server::READABLE,
                 'callback' => [self::class, 'handleSearch'],
@@ -37,7 +37,7 @@ class SearchEndpoint
         if (empty($q) || strlen($q) < 2) {
             return new WP_REST_Response([
                 'code' => 'invalid_query',
-                'message' => __('Query must be at least 2 characters.', 'pressbooks-beacon'),
+                'message' => __('Query must be at least 2 characters.', 'pressbooks-memorious'),
             ], 400);
         }
 

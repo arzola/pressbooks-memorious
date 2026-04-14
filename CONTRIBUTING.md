@@ -1,12 +1,12 @@
-# Contributing to Pressbooks Beacon
+# Contributing to Pressbooks Memorious
 
 Contributions are welcome and appreciated. Here's how to get started.
 
 ## Setup
 
 ```bash
-git clone https://github.com/pressbooks/pressbooks-beacon.git
-cd pressbooks-beacon
+git clone https://github.com/pressbooks/pressbooks-memorious.git
+cd pressbooks-memorious
 composer install
 npm install
 npm run build
@@ -67,11 +67,11 @@ All tests extend `Tests\TestCase` (which extends `\WP_UnitTestCase`). Write test
 
 ## Architecture
 
-- **PSR-4 autoloading**: `PressbooksBeacon\` maps to `src/`
+- **PSR-4 autoloading**: `PressbooksMemorious\` maps to `src/`
 - **No Controllers directory** — admin pages are handled by `SearchAdmin.php`, rendering via Blade templates in `resources/views/`
-- **Single processJob implementation** in `IndexJobProcessor` — `BeaconCommand` delegates to it
+- **Single processJob implementation** in `IndexJobProcessor` — `MemoriousCommand` delegates to it
 - **Node parsing** is centralized in `TypesenseClient::parseNodes()`
-- **Collections reset** is centralized in `BeaconCommand::doResetCollections()`
+- **Collections reset** is centralized in `MemoriousCommand::doResetCollections()`
 - **Asset pipeline**: `PressbooksFrontendTools\Assets` + Vite via pressbooks-build-tools. JS imports CSS; Vite auto-extracts it.
 
 ## Commit Messages
@@ -94,7 +94,7 @@ chore: Update Typesense PHP client to 4.10
 
 ## Reporting Issues
 
-Found a bug? Have a feature request? Please [open an issue](https://github.com/pressbooks/pressbooks-beacon/issues) with:
+Found a bug? Have a feature request? Please [open an issue](https://github.com/pressbooks/pressbooks-memorious/issues) with:
 
 - Steps to reproduce (for bugs)
 - Expected vs. actual behavior

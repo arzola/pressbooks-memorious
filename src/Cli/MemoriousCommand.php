@@ -1,14 +1,14 @@
 <?php
 
-namespace PressbooksBeacon\Cli;
+namespace PressbooksMemorious\Cli;
 
-use PressbooksBeacon\Indexing\IndexJobProcessor;
-use PressbooksBeacon\Search\Collections;
-use PressbooksBeacon\Search\SearchService;
-use PressbooksBeacon\Search\TypesenseClient;
+use PressbooksMemorious\Indexing\IndexJobProcessor;
+use PressbooksMemorious\Search\Collections;
+use PressbooksMemorious\Search\SearchService;
+use PressbooksMemorious\Search\TypesenseClient;
 use WP_CLI;
 
-class BeaconCommand
+class MemoriousCommand
 {
     public function reindex(array $args): void
     {
@@ -92,14 +92,14 @@ class BeaconCommand
         $search = new SearchService(TypesenseClient::fromSettings());
         $search->ensureCollections();
 
-        app('db')->table('pressbooks_beacon_index_jobs')->truncate();
+        app('db')->table('pressbooks_memorious_index_jobs')->truncate();
 
         $this->reindex($args);
     }
 
     public function jobStatus(array $args): void
     {
-        $db = app('db')->table('pressbooks_beacon_index_jobs');
+        $db = app('db')->table('pressbooks_memorious_index_jobs');
 
         $pending = $db->where('status', 'pending')->count();
         $processing = $db->where('status', 'processing')->count();

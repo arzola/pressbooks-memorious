@@ -1,16 +1,16 @@
 <?php
 
-namespace PressbooksBeacon\Admin;
+namespace PressbooksMemorious\Admin;
 
 use Pressbooks\Health\Check;
 use Pressbooks\Health\Result;
-use PressbooksBeacon\Search\TypesenseClient;
+use PressbooksMemorious\Search\TypesenseClient;
 
 class SearchHealthCheck extends Check
 {
     public function run(): Result
     {
-        $settings = get_site_option('pb_beacon_settings', []);
+        $settings = get_site_option('pb_memorious_settings', []);
 
         if (empty($settings['typesense_nodes'])) {
             return Result::failed('Typesense is not configured.');
@@ -20,7 +20,7 @@ class SearchHealthCheck extends Check
             $client = TypesenseClient::fromSettings();
             $client->getClient()->health->retrieve();
 
-            $pendingJobs = app('db')->table('pressbooks_beacon_index_jobs')
+            $pendingJobs = app('db')->table('pressbooks_memorious_index_jobs')
                 ->where('status', 'pending')
                 ->count();
 

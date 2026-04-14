@@ -1,15 +1,14 @@
 <?php
 
-namespace PressbooksBeacon;
+namespace PressbooksMemorious;
 
 use Pressbooks\Container;
-use PressbooksBeacon\Admin\SearchAdmin;
-use PressbooksBeacon\Admin\SearchBar;
-use PressbooksBeacon\Api\SearchEndpoint;
-use PressbooksBeacon\Indexing\IndexJobProcessor;
-use PressbooksBeacon\Search\SearchService;
-use PressbooksBeacon\Cli\BeaconCommand;
-use PressbooksBeacon\Search\TypesenseClient;
+use PressbooksMemorious\Admin\SearchAdmin;
+use PressbooksMemorious\Admin\SearchBar;
+use PressbooksMemorious\Api\SearchEndpoint;
+use PressbooksMemorious\Indexing\IndexJobProcessor;
+use PressbooksMemorious\Search\SearchService;
+use PressbooksMemorious\Search\TypesenseClient;
 
 final class Bootstrap
 {
@@ -36,15 +35,15 @@ final class Bootstrap
     private function registerBlade(): void
     {
         Container::get('Blade')->addNamespace(
-            'PressbooksBeacon',
+            'PressbooksMemorious',
             dirname(__DIR__) . '/resources/views'
         );
     }
 
     private function registerServices(): void
     {
-        Container::set('Beacon\Search', function () {
-            $settings = get_site_option('pb_beacon_settings', []);
+        Container::set('Memorious\Search', function () {
+            $settings = get_site_option('pb_memorious_settings', []);
 
             if (empty($settings['typesense_nodes'])) {
                 return;
@@ -56,7 +55,7 @@ final class Bootstrap
 
     private function registerActions(): void
     {
-        $settings = get_site_option('pb_beacon_settings', []);
+        $settings = get_site_option('pb_memorious_settings', []);
 
         if (empty($settings['typesense_nodes'])) {
             return;
@@ -70,8 +69,8 @@ final class Bootstrap
 
     private function registerIndexingHooks(): void
     {
-        $settings = get_site_option('pb_beacon_settings', []);
-        $search = fn () => Container::get('Beacon\Search');
+        $settings = get_site_option('pb_memorious_settings', []);
+        $search = fn () => Container::get('Memorious\Search');
 
         $indexedPostTypes = ['chapter', 'front-matter', 'back-matter', 'glossary'];
 
@@ -165,32 +164,32 @@ final class Bootstrap
             return;
         }
 
-        $cmd = BeaconCommand::class;
+        $cmd = MemoriousCommand::class;
 
-        \WP_CLI::add_command('beacon reindex', [$cmd, 'reindex'], [
+        \WP_CLI::add_command('memorious reindex', [$cmd, 'reindex'], [
             'shortdesc' => 'Queue reindex for one or all books',
             'synopsis' => '[<blog_id>]',
         ]);
 
-        \WP_CLI::add_command('beacon process-jobs', [$cmd, 'processJobs'], [
+        \WP_CLI::add_command('memorious process-jobs', [$cmd, 'processJobs'], [
             'shortdesc' => 'Process pending indexing jobs',
             'synopsis' => '[<limit>]',
         ]);
 
-        \WP_CLI::add_command('beacon create-collections', [$cmd, 'createCollections'], [
+        \WP_CLI::add_command('memorious create-collections', [$cmd, 'createCollections'], [
             'shortdesc' => 'Create Typesense collections',
         ]);
 
-        \WP_CLI::add_command('beacon reset-collections', [$cmd, 'resetCollections'], [
+        \WP_CLI::add_command('memorious reset-collections', [$cmd, 'resetCollections'], [
             'shortdesc' => 'Delete and recreate Typesense collections',
         ]);
 
-        \WP_CLI::add_command('beacon reindex-reset', [$cmd, 'reindexReset'], [
+        \WP_CLI::add_command('memorious reindex-reset', [$cmd, 'reindexReset'], [
             'shortdesc' => 'Reset collections, clear queue, and reindex everything',
             'synopsis' => '[<blog_id>]',
         ]);
 
-        \WP_CLI::add_command('beacon job-status', [$cmd, 'jobStatus'], [
+        \WP_CLI::add_command('memorious job-status', [$cmd, 'jobStatus'], [
             'shortdesc' => 'Show indexing job queue status',
         ]);
     }

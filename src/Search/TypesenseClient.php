@@ -1,6 +1,6 @@
 <?php
 
-namespace PressbooksBeacon\Search;
+namespace PressbooksMemorious\Search;
 
 use Typesense\Client;
 
@@ -42,7 +42,7 @@ class TypesenseClient
 
     public static function fromSettings(): self
     {
-        $settings = get_site_option('pb_beacon_settings', []);
+        $settings = get_site_option('pb_memorious_settings', []);
 
         return new self(
             nodes: self::parseNodes($settings['typesense_nodes'] ?? ''),
