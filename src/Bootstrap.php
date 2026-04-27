@@ -6,6 +6,7 @@ use Pressbooks\Container;
 use PressbooksMemorious\Admin\SearchAdmin;
 use PressbooksMemorious\Admin\SearchBar;
 use PressbooksMemorious\Api\SearchEndpoint;
+use PressbooksMemorious\Cli\MemoriousCommand;
 use PressbooksMemorious\Indexing\IndexJobProcessor;
 use PressbooksMemorious\Search\SearchService;
 use PressbooksMemorious\Search\TypesenseClient;

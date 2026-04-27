@@ -1,5 +1,5 @@
 {
-	"name": "pressbooks/pressbooks-memorious",
+	"name": "arzola/pressbooks-memorious",
 	"license": "GPL-3.0-or-later",
 	"type": "wordpress-plugin",
 	"description": "Fast, faceted search for Pressbooks networks powered by Typesense.",
